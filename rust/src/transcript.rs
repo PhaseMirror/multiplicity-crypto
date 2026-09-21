@@ -1,8 +1,7 @@
 /// Keccak256-based Fiat-Shamir transcript
-/// 
+///
 /// Implements the transcript protocol for generating verifier challenges
 /// using Keccak256 as the hash function (single-hash policy).
-
 use sha3::{Digest, Keccak256};
 
 pub struct Keccak256Transcript {
@@ -38,7 +37,7 @@ impl Keccak256Transcript {
         let mut challenge_hasher = self.hasher.clone();
         challenge_hasher.update(label);
         let hash = challenge_hasher.finalize();
-        
+
         // Take first 8 bytes as u64
         u64::from_le_bytes(hash[0..8].try_into().unwrap())
     }

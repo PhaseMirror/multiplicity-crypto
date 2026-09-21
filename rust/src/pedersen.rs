@@ -1,5 +1,5 @@
-use ark_bn254::{Fr, G1Projective, G1Affine};
-use ark_ec::{CurveGroup, Group, AffineRepr};
+use ark_bn254::{Fr, G1Affine, G1Projective};
+use ark_ec::{AffineRepr, CurveGroup, Group};
 use ark_ff::{PrimeField, UniformRand};
 use rand::rngs::OsRng;
 use wasm_bindgen::prelude::*;
@@ -27,10 +27,10 @@ impl PedersenCommitment {
         let mut rng = OsRng;
         let r = Fr::rand(&mut rng);
         let v_fr = Fr::from(v);
-        
+
         let c = self.g * v_fr + self.h * r;
         let c_affine = c.into_affine();
-        
+
         // Serialize to hex string for easy passing through WASM
         format!("{},{}", c_affine.x().unwrap(), c_affine.y().unwrap())
     }
@@ -38,10 +38,10 @@ impl PedersenCommitment {
     pub fn commit_with_blind(&self, v: u64, r_bytes: &[u8]) -> String {
         let r = Fr::from_le_bytes_mod_order(r_bytes);
         let v_fr = Fr::from(v);
-        
+
         let c = self.g * v_fr + self.h * r;
         let c_affine = c.into_affine();
-        
+
         format!("{},{}", c_affine.x().unwrap(), c_affine.y().unwrap())
     }
 }
