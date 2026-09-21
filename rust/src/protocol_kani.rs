@@ -37,7 +37,6 @@ fn kani_basis_packing_is_bounded() {
     let values = kani::any::<[u8; 4]>();
     kani::assume(values.iter().all(|value| *value <= 3));
     let packed = pack_basis(&values).unwrap();
-    assert!(packed <= 0xff);
 }
 
 #[kani::proof]

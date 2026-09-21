@@ -8,6 +8,7 @@ setup(
     install_requires=[
         "numpy",
         "sympy",
+        "cryptography>=41.0.0",
     ],
     extras_require={
         "test": ["pytest"],

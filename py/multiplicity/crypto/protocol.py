@@ -29,6 +29,33 @@ ALICE_LABEL = b"ALICE" + bytes(3)
 BOB_LABEL = b"BOB" + bytes(5)
 
 
+def _check_message_type(message_type: int) -> None:
+    if (
+        not isinstance(message_type, int)
+        or isinstance(message_type, bool)
+        or message_type not in (BOOTSTRAP_MESSAGE, CLASSICAL_MESSAGE)
+    ):
+        raise ValueError(f"unsupported message type: {message_type}")
+
+
+def _encode_version(version: Union[int, Bytes]) -> Bytes:
+    if isinstance(version, int) and not isinstance(version, bool):
+        if not 0 <= version <= 0xFF:
+            raise ValueError("version must be between 0 and 255")
+        return bytes([version])
+    version = _check_bytes(version, "version")
+    if not version:
+        raise ValueError("version must not be empty")
+    return version
+
+
+def _check_nonce(value: Bytes, name: str = "nonce") -> Bytes:
+    value = _check_bytes(value, name)
+    if len(value) != 12:
+        raise ValueError(f"{name} must be 12 bytes")
+    return value
+
+
 class ProtocolError(ValueError):
     pass
 
@@ -98,10 +125,10 @@ class SequenceTrace:
     aborted: bool
 
 
-def _check_bytes(value: Bytes, name: str) -> Bytes:
-    if not isinstance(value, bytes):
+def _check_bytes(value: Union[Bytes, bytearray, memoryview], name: str) -> Bytes:
+    if not isinstance(value, (bytes, bytearray, memoryview)):
         raise TypeError(f"{name} must be bytes")
-    return value
+    return bytes(value)
 
 
 def _check_sequence(sequence: int) -> None:
@@ -122,17 +149,15 @@ def _validate_direction(direction: Direction) -> None:
 
 
 def encode_header(message_type: int, sequence: int, payload_length: int) -> Bytes:
-    if message_type not in (BOOTSTRAP_MESSAGE, CLASSICAL_MESSAGE):
-        raise ValueError(f"unsupported message type: {message_type}")
+    _check_message_type(message_type)
     _check_sequence(sequence)
     if not isinstance(payload_length, int) or isinstance(payload_length, bool) or not 0 <= payload_length <= MAX_PAYLOAD_LENGTH:
         raise ValueError(f"payload length must be between 0 and {MAX_PAYLOAD_LENGTH}")
-    return struct.pack(">BIBH", message_type, sequence, payload_length)
+    return struct.pack(">BIH", message_type, sequence, payload_length)
 
 
 def encode_frame(frame: Frame) -> Bytes:
-    if frame.message_type not in (BOOTSTRAP_MESSAGE, CLASSICAL_MESSAGE):
-        raise ValueError(f"unsupported message type: {frame.message_type}")
+    _check_message_type(frame.message_type)
     payload = _check_bytes(frame.payload, "payload")
     if len(payload) > MAX_PAYLOAD_LENGTH:
         raise ValueError(f"payload exceeds {MAX_PAYLOAD_LENGTH} bytes")
@@ -169,8 +194,7 @@ def decode_frame(wire: Bytes) -> Frame:
     if len(wire) < FRAME_HEADER_LENGTH:
         raise ValueError("frame is shorter than its header")
     message_type = wire[0]
-    if message_type not in (BOOTSTRAP_MESSAGE, CLASSICAL_MESSAGE):
-        raise ValueError(f"unsupported message type: {message_type}")
+    _check_message_type(message_type)
     sequence = struct.unpack_from(">I", wire, 1)[0]
     declared = struct.unpack_from(">H", wire, 5)[0]
     tag_length = AUTHENTICATION_TAG_LENGTH if message_type == CLASSICAL_MESSAGE else 0
@@ -188,7 +212,7 @@ def frame_hmac_input(frame: Frame) -> Bytes:
 
 
 def compute_hmac(key: Bytes, data: Bytes) -> Bytes:
-    return hmac.new(_check_key(key), _check_bytes(data, "data"), hashlib.sha256).digest()
+    return hmac.new(_check_bytes(key, "key"), _check_bytes(data, "data"), hashlib.sha256).digest()
 
 
 def constant_time_equal(left: Bytes, right: Bytes) -> bool:
@@ -211,6 +235,7 @@ def compute_authentication_tag(key: Bytes, frame: Frame) -> Bytes:
 
 def sign_frame(key: Bytes, frame: Frame) -> Frame:
     _check_key(key)
+    _check_message_type(frame.message_type)
     if frame.message_type != CLASSICAL_MESSAGE:
         raise ValueError("only CLASSICAL_MESSAGE frames can be signed")
     return Frame(
@@ -221,11 +246,14 @@ def sign_frame(key: Bytes, frame: Frame) -> Frame:
     )
 
 
-def verify_frame_authentication(key: Bytes, frame: Union[Frame, Bytes]) -> bool:
+def verify_frame_authentication(
+    key: Bytes,
+    frame: Union[Frame, Bytes, bytearray, memoryview],
+) -> bool:
     _check_key(key)
-    if isinstance(frame, bytes):
+    if isinstance(frame, (bytes, bytearray, memoryview)):
         try:
-            frame = decode_frame(frame)
+            frame = decode_frame(bytes(frame))
         except ProtocolError:
             return False
     if frame.message_type != CLASSICAL_MESSAGE or frame.authentication_tag is None:
@@ -234,7 +262,9 @@ def verify_frame_authentication(key: Bytes, frame: Union[Frame, Bytes]) -> bool:
 
 
 def hkdf_extract(ikm: Bytes, salt: Bytes = DEFAULT_SALT) -> Bytes:
-    return compute_hmac(_check_bytes(salt, "salt"), _check_bytes(ikm, "ikm"))
+    ikm = _check_bytes(ikm, "ikm")
+    salt = _check_bytes(salt, "salt")
+    return hmac.new(salt, ikm, hashlib.sha256).digest()
 
 
 def hkdf_expand(prk: Bytes, info: Bytes, length: int = 32) -> Bytes:
@@ -252,7 +282,12 @@ def hkdf_expand(prk: Bytes, info: Bytes, length: int = 32) -> Bytes:
     return bytes(output)
 
 
-def hkdf_sha256(ikm: Bytes, salt: Bytes, info: Bytes, length: int = 32) -> Bytes:
+def hkdf_sha256(
+    ikm: Bytes,
+    salt: Bytes = DEFAULT_SALT,
+    info: Bytes = b"",
+    length: int = 32,
+) -> Bytes:
     return hkdf_expand(hkdf_extract(ikm, salt), info, length)
 
 
@@ -375,9 +410,9 @@ def trace_sequence(sequences: Sequence[int]) -> SequenceTrace:
 
 
 class TranscriptChain:
-    def __init__(self, nonce_a: Bytes, nonce_b: Bytes, version: Bytes = VERSION):
+    def __init__(self, nonce_a: Bytes, nonce_b: Bytes, version: Union[int, Bytes] = VERSION):
         self.sid = session_id(nonce_a, nonce_b)
-        version = _check_bytes(version, "version")
+        version = _encode_version(version)
         self._h_a = sha256(version + self.sid + ALICE_LABEL)
         self._h_b = sha256(version + self.sid + BOB_LABEL)
 
@@ -404,6 +439,21 @@ class TranscriptChain:
 
     def snapshot(self) -> TranscriptResult:
         return TranscriptResult(self.sid, self._h_a, self._h_b, self.context_hash())
+
+
+def compute_transcript(
+    nonce_a: Bytes,
+    nonce_b: Bytes,
+    messages_a: Sequence[Bytes] = (),
+    messages_b: Sequence[Bytes] = (),
+    version: Union[int, Bytes] = VERSION,
+) -> TranscriptResult:
+    chain = TranscriptChain(nonce_a, nonce_b, version)
+    for message in messages_a:
+        chain.append("A", message)
+    for message in messages_b:
+        chain.append("B", message)
+    return chain.snapshot()
 
 
 def pack_basis(values: Sequence[int]) -> int:
@@ -440,7 +490,7 @@ class DirectionalAead:
     def encrypt(self, plaintext: Bytes, aad: Bytes = b"") -> AeadOutput:
         plaintext = _check_bytes(plaintext, "plaintext")
         aad = _check_bytes(aad, "aad")
-        if self._next_sequence > 0xFFFFFFFFFFFFFFFF:
+        if self._next_sequence >= 0xFFFFFFFFFFFFFFFF:
             raise ValueError("directional AEAD nonce exhausted")
         nonce = self.nonce_for_next_sequence()
         ciphertext_and_tag = self._backend.encrypt(nonce, plaintext, aad)
@@ -461,7 +511,7 @@ class DirectionalAead:
         if len(authentication_tag) != 16:
             raise ValueError("AES-256-GCM authentication_tag must be 16 bytes")
         expected_nonce = self.nonce_for_next_sequence()
-        received_nonce = expected_nonce if nonce is None else _check_bytes(nonce, "nonce")
+        received_nonce = expected_nonce if nonce is None else _check_nonce(nonce)
         if nonce is not None and received_nonce != expected_nonce:
             expected = struct.unpack(">Q", expected_nonce[4:])[0]
             received = struct.unpack(">Q", received_nonce[4:])[0]
@@ -538,6 +588,7 @@ __all__ = [
     "SenderSequenceRegistry",
     "trace_sequence",
     "TranscriptChain",
+    "compute_transcript",
     "pack_basis",
     "DirectionalAead",
     "ProtocolReceiver",

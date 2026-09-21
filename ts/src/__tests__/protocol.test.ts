@@ -204,6 +204,13 @@ describe('RFC 5869 and directional derivation', () => {
     expect(receiver.nextSequenceExpected).toBe(2n);
   });
 
+  it('rejects an exhausted directional AEAD nonce counter', () => {
+    const keys = deriveDirectionalKeys(Buffer.alloc(32, 0), vectorContextHash);
+    const aead = new DirectionalAead(keys.K_enc_A2B, vectorContextHash, 'A2B');
+    (aead as unknown as { nextSequence: bigint }).nextSequence = 0xffffffffffffffffn;
+    expect(() => aead.encrypt(Buffer.from('payload'))).toThrow(/nonce exhausted/);
+  });
+
   it('implements HKDF expand independently of the convenience wrapper', () => {
     const prk = hkdfExtract(Buffer.alloc(32, 1), Buffer.alloc(32, 2));
     const info = Buffer.from('protocol test info');

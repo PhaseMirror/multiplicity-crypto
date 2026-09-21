@@ -3,7 +3,7 @@ slug: qkd-hybrid-encryption-v1-0
 status: draft
 created: '2026-03-20'
 updated: '2026-03-20'
-version: 0.1.0
+version: 1.0.1
 tags:
 - multiplicity
 traceability:

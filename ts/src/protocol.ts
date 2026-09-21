@@ -472,7 +472,7 @@ export class DirectionalAead {
   encrypt(plaintext: Buffer, aad: Buffer = Buffer.alloc(0)): AeadOutput {
     const plaintextBuffer = assertBuffer(plaintext, 'plaintext');
     const aadBuffer = assertBuffer(aad, 'aad');
-    if (this.nextSequence > 0xffffffffffffffffn) {
+    if (this.nextSequence >= 0xffffffffffffffffn) {
       throw new RangeError('directional AEAD nonce exhausted');
     }
     const nonce = this.nonceForNextSequence();

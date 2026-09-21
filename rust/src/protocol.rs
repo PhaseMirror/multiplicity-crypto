@@ -305,8 +305,8 @@ pub fn frame_hmac_input(frame: &Frame) -> Result<Vec<u8>, ProtocolError> {
 }
 
 pub fn hmac_sha256(key: &[u8], data: &[u8]) -> [u8; 32] {
-    let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(key)
-        .expect("HMAC accepts keys of any length");
+    let mut mac =
+        <Hmac<Sha256> as Mac>::new_from_slice(key).expect("HMAC accepts keys of any length");
     mac.update(data);
     mac.finalize().into_bytes().into()
 }
@@ -553,7 +553,6 @@ pub fn pack_basis(bases: &[u8; 4]) -> Result<u8, ProtocolError> {
 pub struct DirectionalCipher {
     key: [u8; 32],
     prefix: [u8; 4],
-    context_hash: [u8; 32],
     next_sequence: u64,
 }
 
@@ -562,7 +561,6 @@ impl DirectionalCipher {
         Self {
             prefix: derive_nonce_prefix(direction, &key, &context_hash),
             key,
-            context_hash,
             next_sequence: 0,
         }
     }
@@ -714,6 +712,30 @@ mod tests {
         assert_eq!(trace.accepted_count, 7);
         assert_eq!(trace.final_next_expected_sequence, 7);
         assert!(trace.aborted);
+    }
+
+    #[test]
+    fn directional_aead_vector_round_trip_and_replay_protection() {
+        let context =
+            hex::decode("e4b71278b8c643fc0c3ec88ea0efa1b58ae2561aed98959e4f26ea9670298c88")
+                .unwrap();
+        let context: [u8; 32] = context.try_into().unwrap();
+        let keys = derive_directional_keys(&[0; 32], &context, &[0; 32]).unwrap();
+        let mut sender = DirectionalCipher::new(keys.k_enc_a2b, context, &Direction::A2B);
+        let mut receiver = DirectionalCipher::new(keys.k_enc_a2b, context, &Direction::A2B);
+        let ciphertext = sender
+            .encrypt(b"directional payload", b"frame-header")
+            .unwrap();
+        let expected =
+            hex::decode("f364c6773f7f2c28eec8d1a8d54eab38296f839106254d52869ba1d4d686befb66018f")
+                .unwrap();
+        assert_eq!(ciphertext, expected);
+        assert_eq!(sender.next_sequence(), 1);
+        assert_eq!(
+            receiver.decrypt(&ciphertext, b"frame-header").unwrap(),
+            b"directional payload"
+        );
+        assert!(receiver.decrypt(&ciphertext, b"frame-header").is_err());
     }
 
     #[test]
