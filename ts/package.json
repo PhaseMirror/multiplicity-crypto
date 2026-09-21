@@ -1,0 +1,18 @@
+{
+  "name": "multiplicity-crypto-ts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — TypeScript implementation",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

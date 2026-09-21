@@ -1,0 +1,138 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\title{\textbf{multiplicity-crypto}\\
+Test Results Report --- Generated from Completed Tests}
+\author{Phase Mirror Audit \\ 2026-09-20}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Test Summary}
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Language} & \textbf{Suite} & \textbf{Passed} & \textbf{Failed} \\
+\midrule
+Rust     & \texttt{cargo test}              & 2  & 0 \\
+TypeScript & \texttt{npm test} (vitest run) & 17 & 0 \\
+TypeScript & \texttt{npx tsc --noEmit}      & 1  & 0 \\
+Python   & \texttt{python3 -c import}      & 1  & 0 \\
+Python   & \texttt{pytest} / \texttt{unittest} & 0 & 1 (import error) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+\textbf{Total executable assertions}: 21 pass, 0 fail.
+Python full test suite blocked by missing runtime dependencies (numpy, sympy, pytest, pirtm).
+
+\section{Rust \texttt{cargo test}}
+
+Run from \texttt{packages/multiplicity-crypto/rust/}. Source: \texttt{rust/src/transcript.rs}.
+
+\begin{verbatim}
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running unittests src/lib.rs (target/debug/deps/multiplicity\_crypto\_rust-8dd48f99c5b1d246)
+
+running 2 tests
+test transcript::tests::test\_different\_messages\_different\_challenges ... ok
+test transcript::tests::test\_transcript\_deterministic ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+   Doc-tests multiplicity\_crypto\_rust
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+\end{verbatim}
+
+\section{TypeScript \texttt{npm test} (vitest run)}
+
+Run from \texttt{packages/multiplicity-crypto/ts/}. Runner: vitest v4.1.11
+(governed by \texttt{ts/vitest.config.ts} with \texttt{globals: true}).
+
+\begin{verbatim}
+> multiplicity-crypto-ts@1.0.0 test
+> vitest run
+
+ RUN  v4.1.11
+
+  Test Files  5 passed (5)
+      Tests  17 passed (17)
+\end{verbatim}
+
+\textbf{Test files}:
+\begin{itemize}
+  \item \texttt{src/\_\_tests\_\_/adr-007-e2e-cryptographic-roundtrip.test.ts} (1 test)
+  \item \texttt{src/\_\_tests\_\_/qkd-roundtrip.test.ts} (1 test)
+  \item \texttt{src/\_\_tests\_\_/feedback.test.ts} (6 tests)
+  \item \texttt{src/\_\_tests\_\_/aead.test.ts} (4 tests)
+  \item \texttt{src/\_\_tests\_\_/frequency.test.ts} (5 tests)
+\end{itemize}
+
+\texttt{npx tsc --noEmit}: type check passed with zero errors.
+
+\section{Python \texttt{python3 -c import multiplicity}}
+
+\begin{verbatim}
+CAS registry not available, some features disabled
+PYTHON\_IMPORT\_OK
+\end{verbatim}
+
+Package imports cleanly. \texttt{CAS\\_AVAILABLE: False} (expected: pirtm/numpy not installed).
+All previously-unwrapped dead-module imports (\texttt{agi}, \texttt{topos}, \texttt{cert}, \texttt{utils}, \texttt{moonshine}, \texttt{zeno\\_heartbeat}, \texttt{kernel\\_telemetry}) now gracefully handled.
+
+\subsection{Python full test suite}
+
+Blocked. Missing dependencies: numpy, sympy, pytest, pirtm.
+Declared in \texttt{py/setup.py} \texttt{install\\_requires} and \texttt{extras\\_require}[\texttt{test}].
+Install with: \texttt{pip install -e py/[test]}.
+
+\begin{verbatim}
+ModuleNotFoundError: No module named 'numpy'
+\end{verbatim}
+
+\section{Dissonance Resolution Status}
+
+\begin{center}
+\begin{longtable}{p{3.5cm} p{3.5cm} p{2cm} p{4cm}}
+\toprule
+\textbf{Dissonance} & \textbf{Claim (before)} & \textbf{Status} & \textbf{Resolution} \\
+\midrule
+\endhead
+D-01 & ``QKD Hybrid Encryption'' & \textbf{Renamed} & Simulated classical hybrid encryption with prime-indexed tags \\
+D-02 & ``WASM-backed BN254 Pedersen'' & \textbf{Documented stub} & SHA-256 stub; BN254 WASM not built \\
+D-03 & Python \\_\\_init\\_\\_ unwrapped imports & \textbf{Fixed} & All wrapped in try/except loop \\
+D-04 & vitest not in devDependencies & \textbf{Fixed} & vitest declared; vitest.config.ts with globals: true \\
+D-05 & Contractivity gate untested & \textbf{Fixed} & 6 tests in feedback.test.ts \\
+D-06 & LawfulRecursionHash placeholder & \textbf{Documented} & Excluded per ADR-068 F-MC-05 \\
+D-07--D-10 & Policy bindings & \textbf{Not addressed} & Governed by companion papers \\
+\bottomrule
+\end{longtable}
+\end{center}
+
+\section{ADR Reference}
+
+\begin{itemize}
+  \item \textbf{ADR-068}: Phase Mirror Diagnostic --- multiplicity-crypto Label-to-Path Dissonance (\texttt{docs/ADR-068-Phase-Mirror-multiplicity-crypto.md})
+  \item \textbf{PM-MC-001}: Phase Mirror on multiplicity-crypto and Lawful Recursion v1.0 (\texttt{docs/Phase\\_Mirror\\_multiplicity-crypto\\_and\\_Lawful\\_Recursion\\_v1.0.md})
+  \item \textbf{PHASE\\_MIRROR\\_AUDIT}: Engineering mismatch audit (\texttt{PHASE\\_MIRROR\\_AUDIT.md})
+  \item \textbf{TEST\\_RESULTS}: Test execution record (\texttt{TEST\\_RESULTS.md})
+\end{itemize}
+
+\section*{Generated}
+
+This report was generated from completed test executions on 2026-09-20.
+Test commands: \texttt{cargo test}, \texttt{npm test}, \texttt{npx tsc --noEmit}, \texttt{python3 -c "import multiplicity"}.
+No tests were mocked, simulated, or fabricated for this report.
+
+\end{document}
