@@ -1,0 +1,12 @@
+{
+  "name": "multiplicity-crypto-rust",
+  "description": "Production-grade BN254 Pedersen commitments and transcript",
+  "version": "1.0.0",
+  "files": [
+    "multiplicity_crypto_rust_bg.wasm",
+    "multiplicity_crypto_rust.js",
+    "multiplicity_crypto_rust.d.ts"
+  ],
+  "main": "multiplicity_crypto_rust.js",
+  "types": "multiplicity_crypto_rust.d.ts"
+}
