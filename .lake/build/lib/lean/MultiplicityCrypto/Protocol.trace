@@ -1,14 +1,20 @@
 {"synthetic": false,
  "schemaVersion": "2025-09-10",
  "outputs":
- {"o": ["72f934577bc4991f.olean"],
+ {"o": ["5a080eb6eb3d0122.olean"],
   "m": false,
-  "i": "cacf9b69f91a7ff1.ilean",
-  "c": "bbb25319138ee192.c"},
+  "i": "ed99b6ae1bc8a446.ilean",
+  "c": "f55ac5202828a0fd.c"},
  "log":
  [{"message":
    ".> LEAN_PATH=/media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/.lake/build/lib/lean /home/citizen/.elan/toolchains/leanprover--lean4---v4.34.0-rc2/bin/lean /media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/lean/MultiplicityCrypto/Protocol.lean -o /media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/.lake/build/lib/lean/MultiplicityCrypto/Protocol.olean -i /media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/.lake/build/lib/lean/MultiplicityCrypto/Protocol.ilean -c /media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/.lake/build/ir/MultiplicityCrypto/Protocol.c --setup /media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/.lake/build/ir/MultiplicityCrypto/Protocol.setup.json --json",
-   "level": "trace"}],
+   "level": "trace"},
+  {"message":
+   "lean/MultiplicityCrypto/Protocol.lean:278:8: declaration uses `sorry`",
+   "level": "warning"},
+  {"message":
+   "lean/MultiplicityCrypto/Protocol.lean:290:8: declaration uses `sorry`",
+   "level": "warning"}],
  "inputs":
  [["deps",
    [["«multiplicity-crypto»/MultiplicityCrypto:extraDep",
@@ -22,10 +28,10 @@
   ["Lean 4.34.0, commit 6a10ac8c22beadecabdbb0919c2b50214762f91d",
    "365244c167ac8c1d"],
   ["/media/citizen/b361d448-7c51-413a-aa23-9515cb626930/home/citizen/Multiplicity/packages/multiplicity-crypto/lean/MultiplicityCrypto/Protocol.lean",
-   "7dcdb77edef4f4ce"],
+   "82e5dbd24427d259"],
   ["options", "00000000000006bb"],
   ["isModule: false", "feefd2a0d3a1847e"],
   ["Module.name: MultiplicityCrypto.Protocol", "8a40851971e53c2c"],
   ["Package.id?: (some multiplicity-crypto)", "2473d83edf990345"],
   ["Module.leanArgs: #[]", "00000000000006bb"]],
- "depHash": "5efff2e78d67de6b"}
+ "depHash": "eb679d147e5c5a35"}

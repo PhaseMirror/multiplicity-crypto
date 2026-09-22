@@ -1,19 +1,14 @@
 """Official Python interop layer for the `multiplicity.crypto` package.
 
-The ACE / CAS runtime uses this bridge to call the TypeScript/WASM crypto
-backend through a stable Python API. When the Node/WASM bridge is unavailable,
-a deterministic SHA-256 compatibility mode is used with the same public API.
+SHA-256 fallback is the only shipped mode. No Node.js/WASM bridge required.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
-import os
-import shutil
-import subprocess
-from pathlib import Path
 from typing import Any, Dict, List, Optional
+
 
 from .protocol import (
     AeadBackendUnavailable,
@@ -67,11 +62,6 @@ from .protocol import (
     verify_hmac,
     VERSION,
 )
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-TS_PACKAGE_DIR = PROJECT_ROOT / "ts"
-BRIDGE_SCRIPT_PATH = TS_PACKAGE_DIR / "python" / "crypto_bridge.js"
-DIST_ENTRY_PATH = TS_PACKAGE_DIR / "dist" / "src" / "index.js"
 
 
 def _normalize_hex(value: str) -> str:
@@ -160,108 +150,23 @@ def _fallback_bls_aggregate(signatures: List[Dict[str, Any]]) -> str:
 
 
 class MultiplicityCrypto:
-    """Official Python bridge for the TypeScript/WASM crypto backend."""
+    """Official Python bridge for the TypeScript/WASM crypto backend.
 
-    def __init__(self, force_fallback: Optional[bool] = None):
-        self.ts_package_dir = TS_PACKAGE_DIR
-        self.bridge_script_path = BRIDGE_SCRIPT_PATH
-        self.dist_entry_path = DIST_ENTRY_PATH
-        self.node_binary = shutil.which("node")
-        self.force_fallback = bool(
-            force_fallback
-            if force_fallback is not None
-            else os.getenv("MULTIPLICITY_CRYPTO_FORCE_FALLBACK", "0").lower() in {"1", "true", "yes"}
-        )
-        self._bridge_status = self._resolve_bridge_status()
+    SHA-256 fallback is the only shipped mode. No Node.js/WASM bridge required.
+    """
 
-    def _ensure_built(self) -> bool:
-        src_dir = self.ts_package_dir / "src"
-        needs_build = not self.dist_entry_path.exists()
-
-        if not needs_build and src_dir.exists():
-            dist_mtime = self.dist_entry_path.stat().st_mtime
-            latest_src_mtime = max((path.stat().st_mtime for path in src_dir.rglob("*.ts")), default=0.0)
-            needs_build = latest_src_mtime > dist_mtime
-
-        if not needs_build:
-            return True
-
-        pnpm_binary = shutil.which("pnpm")
-        if not pnpm_binary:
-            return False
-
-        try:
-            subprocess.run(
-                [pnpm_binary, "run", "build"],
-                cwd=self.ts_package_dir,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except subprocess.CalledProcessError:
-            return False
-
-        return self.dist_entry_path.exists()
-
-    def _run_node_json(self, command: str, *args: Any) -> Any:
-        if not self.node_binary:
-            raise RuntimeError("Node.js is not available for the multiplicity.crypto bridge")
-
-        serialized_args = [
-            json.dumps(arg) if isinstance(arg, (dict, list)) else str(arg)
-            for arg in args
-        ]
-        result = subprocess.run(
-            [self.node_binary, str(self.bridge_script_path), command, *serialized_args],
-            cwd=self.ts_package_dir,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        stdout = result.stdout.strip() or "null"
-        return json.loads(stdout)
-
-    def _resolve_bridge_status(self) -> Dict[str, Any]:
-        if self.force_fallback:
-            return {"available": True, "mode": "fallback", "reason": "forced"}
-
-        if not self.bridge_script_path.exists():
-            return {"available": True, "mode": "fallback", "reason": "bridge-script-missing"}
-
-        if not self.node_binary:
-            return {"available": True, "mode": "fallback", "reason": "node-unavailable"}
-
-        if not self._ensure_built():
-            return {"available": True, "mode": "fallback", "reason": "dist-unavailable"}
-
-        try:
-            status = self._run_node_json("getBridgeStatus")
-            if isinstance(status, dict):
-                status.setdefault("available", True)
-                status.setdefault("mode", "fallback")
-                return status
-        except Exception as exc:  # pragma: no cover - defensive fallback
-            return {"available": True, "mode": "fallback", "reason": str(exc)}
-
-        return {"available": True, "mode": "fallback", "reason": "status-unavailable"}
+    def __init__(self, force_fallback: Optional[bool] = None) -> None:
+        self.force_fallback = True
+        self._bridge_status = {
+            "available": True,
+            "mode": "fallback",
+            "reason": "bridge-removed-sha256-only",
+        }
 
     def getBridgeStatus(self) -> Dict[str, Any]:
         return dict(self._bridge_status)
 
     def _call(self, command: str, *args: Any) -> Any:
-        can_use_node_bridge = (
-            not self.force_fallback
-            and self.node_binary is not None
-            and self.bridge_script_path.exists()
-            and self.dist_entry_path.exists()
-        )
-
-        if can_use_node_bridge:
-            try:
-                return self._run_node_json(command, *args)
-            except Exception as exc:  # pragma: no cover - defensive fallback
-                self._bridge_status = {"available": True, "mode": "fallback", "reason": str(exc)}
-
         if command == "computeCommitment":
             return _fallback_commitment(str(args[0]), str(args[1]))
         if command == "verifyCommitment":
@@ -433,20 +338,20 @@ class MultiplicityCrypto:
     ) -> str:
         return await self.computeGapWitness(gap_lb, slope_ub, couplings, salt)
 
-    async def bls_sign(private_key: str, message: str) -> Dict[str, Any]:
+    async def bls_sign(self, private_key: str, message: str) -> Dict[str, Any]:
         return await self.blsSign(private_key, message)
 
-    async def bls_verify(payload: Dict[str, Any]) -> bool:
+    async def bls_verify(self, payload: Dict[str, Any]) -> bool:
         return await self.blsVerify(payload)
 
-    async def bls_aggregate(signatures: List[Dict[str, Any]]) -> str:
+    async def bls_aggregate(self, signatures: List[Dict[str, Any]]) -> str:
         return await self.blsAggregate(signatures)
 
     async def qpa_run_prototype(
         self,
         params: Dict[str, Any],
         message: str,
-        mode: str = 'prototype',
+        mode: str = "prototype",
         shadow_count: int = 8,
     ) -> Dict[str, Any]:
         return await self.qpaRunPrototype(params, message, mode, shadow_count)
@@ -520,7 +425,7 @@ async def blsAggregate(signatures: List[Dict[str, Any]]) -> str:
 async def qpaRunPrototype(
     params: Dict[str, Any],
     message: str,
-    mode: str = 'prototype',
+    mode: str = "prototype",
     shadow_count: int = 8,
 ) -> Dict[str, Any]:
     return dict(await _get_crypto_instance().qpaRunPrototype(params, message, mode, shadow_count))
@@ -582,7 +487,7 @@ async def bls_aggregate(signatures: List[Dict[str, Any]]) -> str:
 async def qpa_run_prototype(
     params: Dict[str, Any],
     message: str,
-    mode: str = 'prototype',
+    mode: str = "prototype",
     shadow_count: int = 8,
 ) -> Dict[str, Any]:
     return await qpaRunPrototype(params, message, mode, shadow_count)

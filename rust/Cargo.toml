@@ -2,7 +2,7 @@
 name = "multiplicity-crypto-rust"
 version = "1.0.0"
 edition = "2021"
-description = "Production-grade BN254 Pedersen commitments and transcript"
+description = "Keccak256 Fiat-Shamir transcript; BN254 Pedersen dependencies present but WASM not built"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -20,9 +20,6 @@ rand = "0.8"
 getrandom = { version = "0.2", features = ["js"] }
 wasm-bindgen = "0.2"
 hex = "0.4"
-
-[dev-dependencies]
-wasm-bindgen-test = "0.3"
 
 [workspace]
 

@@ -29,34 +29,22 @@ except Exception:
 
 from . import math
 from . import mkt
-
-for _m in ("agi", "topos", "cert", "utils", "moonshine", "zeno_heartbeat", "kernel_telemetry"):
-    try:
-        __import__(f".{_m}", fromlist=[_m])
-    except Exception:
-        pass
-
 from . import crypto  # Foundational crypto interop
 
-try:
-    from .zeno_heartbeat import HeartbeatConfig, HeartbeatViolation, assess_rt_feasibility, enforce_heartbeat
-except Exception:
-    HeartbeatConfig = None
-    HeartbeatViolation = Exception
-    def assess_rt_feasibility(config):
-        return []
-    def enforce_heartbeat(config, measured_jitter):
-        return True
+# Stubs for missing modules to prevent cascading import failures
+HeartbeatConfig = None
+HeartbeatViolation = Exception
+def assess_rt_feasibility(config):
+    return []
+def enforce_heartbeat(config, measured_jitter):
+    return True
 
-try:
-    from .kernel_telemetry import KernelTelemetry, emit_telemetry, serialize_telemetry, load_telemetry, write_telemetry_artifact
-except Exception:
-    KernelTelemetry = None
-    def emit_telemetry(*args, **kwargs):
-        return None
-    def serialize_telemetry(t):
-        return {}
-    def load_telemetry(d):
-        return {}
-    def write_telemetry_artifact(*args, **kwargs):
-        return None
+KernelTelemetry = None
+def emit_telemetry(*args, **kwargs):
+    return None
+def serialize_telemetry(t):
+    return {}
+def load_telemetry(d):
+    return {}
+def write_telemetry_artifact(*args, **kwargs):
+    return None

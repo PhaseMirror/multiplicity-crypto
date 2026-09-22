@@ -1,8 +1,14 @@
 export interface IQKDBackend {
-    getKey(input: QKDSimulatorInput): QKDSimulatorOutput;
+    getKey(input: QKDSimulatorInput): QKDSimulatorOutput | Promise<QKDSimulatorOutput>;
 }
 export declare class MockQKDBackend implements IQKDBackend {
     getKey(input: QKDSimulatorInput): QKDSimulatorOutput;
+}
+export declare class HardwareQKDBackend implements IQKDBackend {
+    private endpoint;
+    private saeId;
+    constructor(endpoint: string, saeId: string);
+    getKey(input: QKDSimulatorInput): Promise<QKDSimulatorOutput>;
 }
 import { MultiplicityProfile } from './multiplicity';
 export interface QKDSimulatorInput {

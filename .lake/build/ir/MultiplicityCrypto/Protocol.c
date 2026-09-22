@@ -392,6 +392,16 @@ LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_T
 LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_TranscriptContext_appendAlice(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_TranscriptContext_appendBob(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_contextHash(lean_object*, lean_object*);
+static lean_once_cell_t lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0;
+static lean_once_cell_t lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1;
+static lean_once_cell_t lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2;
+static lean_once_cell_t lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3_once = LEAN_ONCE_CELL_INITIALIZER;
+static lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3;
+LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag(lean_object*);
+LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___boxed(lean_object*);
 LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_byte(lean_object* v_value_1_){
 _start:
 {
@@ -3472,6 +3482,67 @@ lean_dec_ref(v_bob_1188_);
 v___x_1191_ = l_List_appendTR___redArg(v_current_1189_, v_current_1190_);
 v___x_1192_ = lean_apply_1(v_hash_1185_, v___x_1191_);
 return v___x_1192_;
+}
+}
+static lean_object* _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0(void){
+_start:
+{
+lean_object* v___x_1193_; lean_object* v___x_1194_; 
+v___x_1193_ = lean_unsigned_to_nat(80u);
+v___x_1194_ = lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_byte(v___x_1193_);
+return v___x_1194_;
+}
+}
+static lean_object* _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1(void){
+_start:
+{
+lean_object* v___x_1195_; lean_object* v___x_1196_; 
+v___x_1195_ = lean_unsigned_to_nat(77u);
+v___x_1196_ = lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_byte(v___x_1195_);
+return v___x_1196_;
+}
+}
+static lean_object* _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2(void){
+_start:
+{
+lean_object* v___x_1197_; lean_object* v___x_1198_; lean_object* v___x_1199_; 
+v___x_1197_ = lean_box(0);
+v___x_1198_ = lean_obj_once(&lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1, &lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1_once, _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__1);
+v___x_1199_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1199_, 0, v___x_1198_);
+lean_ctor_set(v___x_1199_, 1, v___x_1197_);
+return v___x_1199_;
+}
+}
+static lean_object* _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3(void){
+_start:
+{
+lean_object* v___x_1200_; lean_object* v___x_1201_; lean_object* v___x_1202_; 
+v___x_1200_ = lean_obj_once(&lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2, &lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2_once, _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__2);
+v___x_1201_ = lean_obj_once(&lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0, &lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0_once, _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__0);
+v___x_1202_ = lean_alloc_ctor(1, 2, 0);
+lean_ctor_set(v___x_1202_, 0, v___x_1201_);
+lean_ctor_set(v___x_1202_, 1, v___x_1200_);
+return v___x_1202_;
+}
+}
+LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag(lean_object* v_prime_1203_){
+_start:
+{
+lean_object* v___x_1204_; lean_object* v___x_1205_; lean_object* v___x_1206_; 
+v___x_1204_ = lean_obj_once(&lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3, &lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3_once, _init_lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___closed__3);
+v___x_1205_ = lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_be32(v_prime_1203_);
+v___x_1206_ = l_List_appendTR___redArg(v___x_1204_, v___x_1205_);
+return v___x_1206_;
+}
+}
+LEAN_EXPORT lean_object* lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag___boxed(lean_object* v_prime_1207_){
+_start:
+{
+lean_object* v_res_1208_; 
+v_res_1208_ = lp_multiplicity_x2dcrypto_MultiplicityCrypto_Protocol_domainTag(v_prime_1207_);
+lean_dec(v_prime_1207_);
+return v_res_1208_;
 }
 }
 lean_object* initialize_Init(uint8_t builtin);

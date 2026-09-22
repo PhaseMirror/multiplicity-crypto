@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: multiplicity-crypto-py
+Version: 1.0.0
+Summary: Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — Python interop bridge
+Requires-Python: >=3.9
+Provides-Extra: test
