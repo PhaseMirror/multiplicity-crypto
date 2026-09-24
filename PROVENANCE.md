@@ -137,5 +137,6 @@ The statement "eight ADRs, eight commits" is a register row, not a closing-repor
 | ADR-091 | `7b00783` | `probes/adr-091.sh` |
 | round-3 hardening (D-18..D-21) | `65fd862` | `probes/adr-090.sh`, `probes/adr-091.sh` |
 | register pin | `6dba90b` | `probes/adr-090.sh` (PROVENANCE clean-diff) |
+| round-4 governance (§A gate-scope citation, §B wasm-existence + denylist-by-design, §H itself) | `c7e9744` | `probes/adr-090.sh` (binary-ext sweep), `probes/adr-091.sh` (governance §ii) |
 
 Ancestry is called: for every row, `git merge-base --is-ancestor <commit> HEAD` must succeed, and `git diff --exit-code <commit> -- PROVENANCE.md` must hold at HEAD. The closing report cites rows from this section; if the report and the register disagree, the register wins and the report is the defect.
