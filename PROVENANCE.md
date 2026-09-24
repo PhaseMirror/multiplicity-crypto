@@ -18,7 +18,7 @@ Registered at the ADR-090 commit; each artifact below is pinned to its own last-
 | `shipped` (Python mirror) | `py/multiplicity/crypto/protocol.py` | `9993912` | `a2b96a187fca…` | `git log --oneline -1 -- py/multiplicity/crypto/protocol.py` |
 | `shipped` (Rust mirror) | `rust/src/protocol.rs` | `9993912` | `b72330bdcb6f…` | `git log --oneline -1 -- rust/src/protocol.rs` |
 | gate | all `shipped` + `specified` vectors, 14/14 × **TS/Py/Rust only** | `9993912` | — | `cd ts && npm run diff-vectors` prints `ts gate: 14/14 vectors matched`, `py gate: 14/14 vectors matched`, `rust gate: 14/14 vectors matched` |
-| gate scope | **Lean is excluded from the differential.** `lean/MultiplicityCrypto/Protocol.lean` models frames and secrets but `Digest := Bytes` with an abstract `Hash` structure — it emits no concrete digests, so ADR-084's own condition (`… and Lean once it can emit digests (ADR-087)`) is unmet. This row exists so the gap is visible and flaggable, not silent. | `98990a8` | — | `grep -nE "abbrev Digest|structure Hash" lean/MultiplicityCrypto/Protocol.lean` → abstract digest, no SHA-256 implementation |
+| gate scope | **Lean is excluded from the differential — sanctioned by ADR-084 itself, not narrowed by the report.** ADR-084 decision 3 (`docs/ADR-084-Protocol-Family-Labeled-Artifact-Graph.md:56`) reads: SHALL run `shipped` vectors through *the TS, Python, and Rust shipped paths* "(and Lean once it can emit digests, ADR-087)". The three-language scope is the ADR's own decision; Lean's inclusion is conditional on an unmet precondition (`Digest := Bytes`, abstract `Hash` — it emits no concrete digests). | `98990a8` | `grep -n "and Lean once it can emit digests" docs/ADR-084-Protocol-Family-Labeled-Artifact-Graph.md` → `:56` |
 | vector scope | The 8 `shipped` vectors cover exactly the shipped path: sha256 (×2), hkdf_extract, hkdf_expand, directional_keys, nonce_prefixes, build_nonce, aead_encrypt (SHA-256 / HKDF-SHA256 / AES-256-GCM). The SHA-256 commitment function (`computeCommitment`, `PM-COMMIT` tags) is **NOT vector-covered** — no `commitment` operation exists in `vectors/protocol.json`; that surface is untested cross-language. | `9993912` | — | `python3 -c "import json;v=json.load(open('vectors/protocol.json'));print(sorted({x['operation'] for x in v['vectors']}))"` → no `commitment` op |
 | `compiled` | `rust/pkg/multiplicity_crypto_rust_bg.wasm` — **RETIRED** | removed `660fc3d` (ADR-085); historical pin `2c7d4f7` | historical `8f3ea7510a79…8166` | `git ls-files rust/pkg/` → 0; `git show 2c7d4f7:rust/pkg/multiplicity_crypto_rust_bg.wasm \| sha256sum` |
 | `claimed` | `lean/MultiplicityCrypto/Protocol.lean` — **verified: 0 `sorry`, 0 `axiom`** in every tracked `*.lean`; allowlist ratchet **N=0, occurrences=0** (not "clean" — numeric) | `98990a8` (ADR-087) + round-3 hardening commit `65fd862` (below) | `c30b3ad8d8e7…` | `lake build`; `bash scripts/check-sorry-allowlist.sh` prints `PASS: sorry ratchet N=0, occurrences=0`; `git grep -nE "sorry\|axiom\|admit" -- 'lean/*.lean' 'lean/**/*.lean'` → 0 (this commit also deletes `lean/test.lean`, which ADR-087's addendum claimed deleted but which was still tracked with `sorry`+`axiom` — see D-14) |
@@ -31,13 +31,16 @@ Every path below is either git-ignored or removed; none is an unregistered commi
 |------|-------------|-------------|
 | `.lake/` | git-ignored, untracked (ADR-087 @ `98990a8`) | `git ls-files .lake/` → 0; `git check-ignore .lake/` |
 | `rust/target/` | untracked + git-ignored (ADR-090). Prior to ADR-090 this directory was committed (3563 paths, machine-specific build output). | `git ls-files rust/target/` → 0; `git check-ignore rust/target/` |
-| `rust/pkg/` | removed (ADR-085 @ `660fc3d`, Option B — retire the BN254 artifact and its loaders) | `git ls-files rust/pkg/` → 0 |
+| `rust/pkg/` | removed (ADR-085 @ `660fc3d`, Option B — retire the BN254 artifact and its loaders) | `git ls-files rust/pkg/` → 0; `ls rust/pkg` on the working tree → no such directory |
+| wasm bytecode on disk (existence, separate from tracking) | **At HEAD, two `.wasm` bytecode files exist, both under the ignored `rust/target/wasm32-unknown-unknown/release/{,deps/}`** — cargo build residue. `rust/pkg/` does not exist. Nothing loads them (TS/Python loaders removed @ `660fc3d`), so they are inert bytecode, not a working supply chain path; README:3's "`wasm-pack` may be run" is a build recipe, not a present artifact. This row answers the existence question the tracking denylist cannot. | `find . -name '*.wasm' -not -path './.git/*'` → exactly the two `rust/target/` paths; `git ls-files '*.wasm'` → 0 |
 | `ts/dist/` | untracked + git-ignored (`ts/.gitignore`); stale dist dropped ADR-086 @ `a3d91d1` | `git ls-files ts/dist/` → 0; `git check-ignore ts/dist/` |
 | `*/node_modules/` | **untracked (`65fd862`). Prior to this commit 1354 `ts/node_modules/` paths were tracked** despite `ts/.gitignore` — tracked files are invisible to `git check-ignore`, so the ignore never protected the index. | `git ls-files '*/node_modules/**'` → 0 |
 | `**/__pycache__/*.pyc` | **untracked + git-ignored (`65fd862`). Prior to this commit 21 `.pyc` files were tracked** (machine-specific bytecode) despite SOURCES.md's "no compiled artifacts" inventory table — same defect class as `rust/target/`. | `git ls-files '*.pyc'` → 0; `git check-ignore py/multiplicity/__init__.py` build product |
 | `*.egg-info/` | **untracked + git-ignored (`65fd862`). Prior to this commit `py/multiplicity_crypto_py.egg-info/` (5 files, generated metadata) was tracked.** | `git ls-files '*.egg-info/**'` → 0; `git check-ignore py/multiplicity_crypto_py.egg-info/` |
 
 The denylist above is a **gate, not a label**: `probes/adr-090.sh` fails if ANY of these patterns is present in the index (`rust/target .lake node_modules __pycache__ *.egg-info ts/dist rust/pkg *.wasm *.py[cod] *.egg-link`). Three artifact classes (`__pycache__`, `*.egg-info`, `node_modules`) were discovered still tracked by the round-3 audit — each "git-ignored" yet immune to `check-ignore` once tracked — and each is now denied by the gate, so the class cannot return silently.
+
+**Denylist-by-design (named, not silent).** The enumerated classes are this repository's *past* shipped-tracked artifact classes. Two mitigations bound the residual: (i) a **binary-extension sweep** (`*.so *.dylib *.dll *.exe *.class *.jar *.a *.o *.profraw *.profdata *.tgz`, plus the `.wasm`/`.py[cod]`/`.egg-link` in the denylist) catches a *new binary* class the moment it is staged, without waiting for enumeration; (ii) the adr-091 inventory gate (§G) forces registration of any tracked file under the code roots, so a vendored binary or build directory inside `ts/src/`, `py/multiplicity/`, `rust/src/`, or `lean/` fails immediately. **What still escapes by design:** a tracked *text-format* generated artifact outside the code roots under a novel top-level name (e.g. `generated/*.sql`, an un-enumerated `third_party/` text tree). That residual is accepted and recorded here, not concealed.
 
 ## C. README / SOURCES label probes
 
@@ -104,7 +107,7 @@ Each accepted ADR registers one probe — the smallest command whose failure pro
 | `probes/adr-088.sh` | ADR-088 honest labels | `HARDWARE_QKD_ETSI_014` in `qkd.ts` + hardware test; `SIMULATED_QKD` default in `qkd.ts` |
 | `probes/adr-089.sh` | ADR-089 optional-dep honesty | `pirtm` in `py/setup.py`; `importorskip("pirtm")`; ≥3 MKT placeholder markers; `NotImplementedError` guard |
 | `probes/adr-090.sh` | ADR-090 register + artifact denylist gate | `PROVENANCE.md` committed & `git diff --exit-code` clean; **artifact denylist empty in the index** (`rust/target .lake node_modules __pycache__ *.egg-info ts/dist rust/pkg *.wasm *.py[cod]`) |
-| `probes/adr-091.sh` | ADR-091 self + **source-inventory meta-probe** | `probes/run-all.sh` present/executable; ≥15 probe scripts tracked; **bidirectional check: every tracked file under `ts/src/ py/ rust/src/ lean/` has a row in `probes/inventory.txt`, and every row is tracked** — a new module unregistered in the inventory fails the gate (ADR-091 §G) |
+| `probes/adr-091.sh` | ADR-091 self + **source-inventory** + **governance** gates | `probes/run-all.sh` present/executable; ≥15 probe scripts tracked; **(i) bidirectional inventory check: every tracked file under `ts/src/ py/ rust/src/ lean/` has a row in `probes/inventory.txt`, every row is tracked** — a new module unregistered fails the gate; **(ii) governance: every probe and every ADR cited in the inventory resolves to an Accepted ADR doc** — new code must declare accepted doctrine or carry the amendment first (ADR-091 §G/H) |
 
 Simulated-contradiction check at acceptance: mutating `dev/null`-free temporary copy of `ts/src/commitment.ts` header to reintroduce `WASM-backed` makes `probes/adr-070.sh` fail — the gate itself is verified to detect the D-12 class of regression (ADR-091 Testing).
 
@@ -115,4 +118,24 @@ ADR-091's per-ADR probes fire only on the *specific* claim each ADR made. They c
 - every tracked file under a root MUST have an inventory row — so **adding a module without a register row (hence without an ADR decision) fails the gate**, the process rule behind ADR-091 #1 cached as a command;
 - every inventory row MUST still be tracked — so a superseded entry cannot linger.
 
-Built from `git ls-files` at `65fd862`: 49 rows (lean 2, py 23, rust/src 6, ts/src 18). The inventory file and the meta-probe itself live under `probes/` and are guarded by `probes/adr-091.sh`'s executable/count checks plus the ADR-091 rows in §F — the gate guards its own substrate. A rejection citing "unregistered module under `ts/src/`" resolves to `probes/adr-091.sh` → `probes/inventory.txt:path`.
+Built from `git ls-files` at `65fd862`: 49 rows (lean 2, py 23, rust/src 6, ts/src 18). The inventory file and the meta-probe itself live under `probes/` and are guarded by `probes/adr-091.sh`'s executable/count checks plus the ADR-091 rows in §F — the gate guards its own substrate.
+
+**Governance (adr-091 §ii).** The inventory only makes registration mandatory; adr-091 additionally requires that every `ADR-NNN` cited in the inventory — and every probe `adr-NNN.sh` — resolves to `docs/ADR-NNN-*.md` with `- **Status**: Accepted`. New code therefore must sit under a governing ADR that is itself Accepted, or the change must carry the amendment or new ADR first. A hardware client "under a different name" (the D-15 pattern) lands in `ts/src/`, is caught unregistered by §(i), and on registration must declare which accepted ADR governs its doctrinal claims — the governance rule is now a command, not a preference. A rejection citing "unregistered module under `ts/src/`" resolves to `probes/adr-091.sh` → `probes/inventory.txt:path`.
+## H. Commit ↔ ADR genealogy (the report is a projection of this section)
+
+The statement "eight ADRs, eight commits" is a register row, not a closing-report flourish. Each ADR's `Status` flip to Accepted happened in its own implementation commit (ADR-090 rule); every ADR below has a probe (§F):
+
+| ADR | Implementation commit | Probe |
+|-----|----------------------|-------|
+| ADR-084 | `9993912` | `probes/adr-084.sh` |
+| ADR-085 | `660fc3d` | `probes/adr-085.sh` |
+| ADR-086 | `a3d91d1` | `probes/adr-086.sh` |
+| ADR-087 | `98990a8` | `probes/adr-087.sh` |
+| ADR-088 | `ca24d47` | `probes/adr-088.sh` |
+| ADR-089 | `7832f42` | `probes/adr-089.sh` |
+| ADR-090 | `c7ea22e` | `probes/adr-090.sh` |
+| ADR-091 | `7b00783` | `probes/adr-091.sh` |
+| round-3 hardening (D-18..D-21) | `65fd862` | `probes/adr-090.sh`, `probes/adr-091.sh` |
+| register pin | `6dba90b` | `probes/adr-090.sh` (PROVENANCE clean-diff) |
+
+Ancestry is called: for every row, `git merge-base --is-ancestor <commit> HEAD` must succeed, and `git diff --exit-code <commit> -- PROVENANCE.md` must hold at HEAD. The closing report cites rows from this section; if the report and the register disagree, the register wins and the report is the defect.
