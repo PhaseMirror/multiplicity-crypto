@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # ADR-090 probe: PROVENANCE.md exists, is committed with the tree it
-# describes, and no build-artifact directory is tracked (each is either
-# ignored or removed).
-# Pin: PROVENANCE.md (c7ea22e).
+# describes, and the artifact denylist is empty in the index. The denylist
+# sweep is a gate: it covers every artifact class this repo has ever shipped
+# tracked, so a silent return of rust/target, node_modules, __pycache__,
+# egg-info, or wasm fails the probe even though each was "git-ignored" at the
+# time (tracked files are invisible to git check-ignore).
+# Pin: PROVENANCE.md B (c7ea22e, denylist extended by round-3 hardening).
 set -u
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 if [ ! -f PROVENANCE.md ]; then
@@ -13,8 +16,12 @@ if ! git diff --exit-code -- PROVENANCE.md >/dev/null 2>&1; then
   echo "FAIL ADR-090: PROVENANCE.md not committed with the tree it describes"
   exit 1
 fi
-if [ "$(git ls-files rust/target/ | wc -l)" -ne 0 ] || [ "$(git ls-files .lake/ | wc -l)" -ne 0 ]; then
-  echo "FAIL ADR-090: rust/target or .lake is tracked"
+viol=$(git ls-files | grep -E '(^|/)(rust/target|\.lake|node_modules|__pycache__|ts/dist|rust/pkg)/|[^/]*\.egg-info/' || true)
+viol="$viol$(git ls-files '*.wasm' '*.pyc' '*.pyo' '*.egg-link' | sed 's/^/ /')"
+if [ -n "$(printf '%s' "$viol" | tr -s ' ' | sed '/^$/d')" ]; then
+  echo "FAIL ADR-090: tracked artifact paths present in the index:"
+  printf '  %s\n' "$viol"
   exit 1
 fi
-echo "PASS ADR-090: PROVENANCE.md committed and clean; build artifacts untracked"
+echo "PASS ADR-090: PROVENANCE.md committed and clean; artifact denylist empty"
+echo "  denylist: rust/target .lake node_modules __pycache__ *.egg-info ts/dist rust/pkg *.wasm *.pyc"

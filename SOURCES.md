@@ -149,6 +149,8 @@ Per ADR-076, the Node.js bridge dependency has been removed. `MultiplicityCrypto
 
 `rust/Cargo.toml` declares `ark-bn254`, `ark-ec`, `ark-ff`, `wasm-bindgen` and `getrandom` (js) for an optional BN254 Pedersen commitment path (`rust/src/pedersen.rs`). Per ADR-085 (Option B, committed artifact removed), `wasm-pack` may be run to produce a loadable artifact at `rust/pkg/`; **no compiled artifact is committed.** The SHA-256 commitment (`PM-COMMIT-p${prime}`, ADR-070) is the only shipped commitment mechanism.
 
+**Round-3 artifact sweep (ADR-090 §B, enforced by `probes/adr-090.sh`):** no build output is in the index — `rust/target/`, `.lake/`, `*/node_modules/` (1354 `ts/node_modules/` paths were tracked until round 3), `**/__pycache__/*.pyc` (21 tracked until round 3), `*.egg-info/` (5 tracked until round 3), `ts/dist/`, `rust/pkg/`, `*.wasm`. Each class is denylisted in the probe so a silent return fails the gate even where `check-ignore` cannot see tracked files.
+
 ## Test Infrastructure (Post-Consolidation)
 
 | Artifact | Origin |
@@ -161,6 +163,7 @@ Per ADR-076, the Node.js bridge dependency has been removed. `MultiplicityCrypto
 | `py/setup.py` dependencies | `numpy`, `sympy`, `cryptography` in `install_requires`; `pytest` in `extras_require["test"]`; `pirtm` in `extras_require["cas"]` (ADR-089) |
 | `PROVENANCE.md` (+ section A/B/C/D/E role/pin rows) | Created — claim register backing ADR-084 role rows, artifact dispositions, D-items and suite counts (ADR-090) |
 | `probes/adr-*.sh`, `probes/run-all.sh` | Created — conformance gate, one probe per accepted ADR, blocking merge control (ADR-091) |
+| `probes/inventory.txt` | Created — ADR-091 source-inventory register; every tracked file under `ts/src/ py/ rust/src/ lean/` resolves to a governing ADR/probe; new modules fail the gate until registered (round-3 hardening) |
 
 ## Python Module Import Inventory (All Imports Accounted)
 

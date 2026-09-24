@@ -1,0 +1,74 @@
+# ADR-091 source inventory. Every tracked file under the enumerated roots
+# (ts/src/ py/ rust/src/ lean/) MUST be listed here with a governing ADR/probe
+# reference; every row MUST still be tracked. Enforced by probes/adr-091.sh.
+# Adding a source file therefore requires a register row, hence an ADR decision.
+# One path per line, first whitespace token is the path; path must match git ls-files.
+
+# lean/ — ADR-087 (98990a8) + probes/adr-087.sh
+lean/MultiplicityCrypto/Protocol.lean
+lean/.sorry-allowlist
+
+# py/multiplicity/crypto — ADR-085 shipped path, ADR-084 vectors, probes/adr-084.sh
+py/multiplicity/crypto/__init__.py
+py/multiplicity/crypto/protocol.py
+
+# py/multiplicity/cert — ADR-089 optional pirtm integration, probes/adr-089.sh
+py/multiplicity/cert/__init__.py
+py/multiplicity/cert/lambda_m_protocols.py
+py/multiplicity/cert/test_ace_crypto_integration.py
+
+# py/multiplicity/math — ADR-070 commitment registry (PM-tags), probes/adr-070.sh
+py/multiplicity/math/__init__.py
+py/multiplicity/math/cas_registry.py
+py/multiplicity/math/core_math.py
+
+# py/multiplicity/mkt — ADR-089 stub honesty, probes/adr-089.sh
+py/multiplicity/mkt/__init__.py
+py/multiplicity/mkt/mkt_colored_braid.py
+py/multiplicity/mkt/mkt_commitment.py
+py/multiplicity/mkt/mkt_constants_estimation.py
+py/multiplicity/mkt/mkt_invariant.py
+
+# py/multiplicity surface packages — registered under SOURCES.md inventory
+py/multiplicity/__init__.py
+py/multiplicity/agi/__init__.py
+py/multiplicity/kernel_telemetry/__init__.py
+py/multiplicity/moonshine/__init__.py
+py/multiplicity/topos/__init__.py
+py/multiplicity/utils/__init__.py
+py/multiplicity/zeno_heartbeat/__init__.py
+
+# py/ distribution + tests — ADR-084 vectors, ADR-089 extras, probes/adr-084.sh, adr-089.sh
+py/setup.py
+py/scripts/vector_executor.py
+py/tests/test_protocol.py
+
+# rust/src — ADR-084 vectors, ADR-085 shipped Rust path, probes/adr-084.sh
+rust/src/bin/vector_executor.rs
+rust/src/lib.rs
+rust/src/pedersen.rs
+rust/src/protocol_kani.rs
+rust/src/protocol.rs
+rust/src/transcript.rs
+
+# ts/src — ADR-084 vectors, ADR-085 shipped TS path, probes/adr-084.sh
+ts/src/aead.ts
+ts/src/commitment.ts
+ts/src/feedback.ts
+ts/src/frequency.ts
+ts/src/index.ts
+ts/src/keyderivation.ts
+ts/src/multiplicity.ts
+ts/src/protocol.ts
+ts/src/qkd.ts
+ts/src/transcript.ts
+
+# ts/src/__tests__ — ADR-088 mock-endpoint test surface, probes/adr-088.sh
+ts/src/__tests__/adr-007-e2e-cryptographic-roundtrip.test.ts
+ts/src/__tests__/aead.test.ts
+ts/src/__tests__/feedback.test.ts
+ts/src/__tests__/frequency.test.ts
+ts/src/__tests__/hardware-qkd-backend.test.ts
+ts/src/__tests__/protocol.test.ts
+ts/src/__tests__/qkd-roundtrip.test.ts
+ts/src/__tests__/vectors-conformance.test.ts

@@ -1,2 +1,5 @@
 .lake/
 rust/target/
+__pycache__/
+*.py[cod]
+*.egg-info/
