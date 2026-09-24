@@ -279,21 +279,46 @@ theorem contractivityBound_strict (score : Nat) (p : Nat) (scale : Nat)
     (hScale : scale > 0) 
     (hValid : ContractivityBound.isValid score p scale) :
     score < scale := by
-  sorry
+  unfold ContractivityBound.isValid at hValid
+  by_cases h : score < scale
+  · exact h
+  · have hg : scale ≤ score := Nat.le_of_not_gt h
+    exfalso
+    have h1 : scale * (p + 1) ≤ score * (p + 1) := Nat.mul_le_mul_right (p + 1) hg
+    have h2 : p * scale < scale * (p + 1) := by
+      rw [Nat.mul_comm p scale]
+      rw [Nat.mul_add, Nat.mul_one]
+      exact Nat.lt_add_of_pos_right hScale
+    have h3 : p * scale < score * (p + 1) := Nat.lt_of_lt_of_le h2 h1
+    exact Nat.not_lt_of_ge hValid h3
 
-axiom getPrimeAtIndex : Nat → Nat
-axiom getPrimeAtIndex_inj : ∀ {n m : Nat}, getPrimeAtIndex n = getPrimeAtIndex m → n = m
+theorem be32_inj_lt {a b : Nat} (ha : a < 2 ^ (32 : Nat)) (hb : b < 2 ^ (32 : Nat))
+    (h : be32 a = be32 b) : a = b := by
+  have e0 : (a / 16777216) % 256 = (b / 16777216) % 256 := by
+    have t := congrArg (fun (l : Bytes) => l[0]?.map Fin.val) h
+    simpa [byte, be32] using t
+  have e1 : (a / 65536) % 256 = (b / 65536) % 256 := by
+    have t := congrArg (fun (l : Bytes) => l[1]?.map Fin.val) h
+    simpa [byte, be32] using t
+  have e2 : (a / 256) % 256 = (b / 256) % 256 := by
+    have t := congrArg (fun (l : Bytes) => l[2]?.map Fin.val) h
+    simpa [byte, be32] using t
+  have e3 : a % 256 = b % 256 := by
+    have t := congrArg (fun (l : Bytes) => l[3]?.map Fin.val) h
+    simpa [byte, be32] using t
+  omega
 
 def domainTag (prime : Nat) : Bytes :=
   [byte 0x50, byte 0x4D] ++ be32 prime
 
-theorem domainTag_prime_inj (p1 p2 : Nat) (h : domainTag p1 = domainTag p2) : p1 = p2 := by
-  sorry
-
-theorem domainTag_index_inj (n m : Nat) 
-    (h : domainTag (getPrimeAtIndex n) = domainTag (getPrimeAtIndex m)) : n = m := by
-  apply getPrimeAtIndex_inj
-  apply domainTag_prime_inj _ _ h
+theorem domainTag_prime_inj (p1 p2 : Nat)
+    (h1 : p1 < 2 ^ (32 : Nat)) (h2 : p2 < 2 ^ (32 : Nat))
+    (h : domainTag p1 = domainTag p2) : p1 = p2 := by
+  have hdrop : (domainTag p1).drop 2 = (domainTag p2).drop 2 := by
+    rw [h]
+  have hbe : be32 p1 = be32 p2 := by
+    simpa [domainTag, be32] using hdrop
+  exact be32_inj_lt h1 h2 hbe
 
 end Protocol
 end MultiplicityCrypto

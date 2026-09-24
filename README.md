@@ -10,6 +10,7 @@ Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cry
 | `py/multiplicity/` | Python | Interop bridge (`multiplicity.crypto`) + CAS registry consumer |
 | `rust/src/` | Rust | Keccak256 Fiat-Shamir transcript for prover challenges |
 | `vectors/` | JSON | Protocol family conformance vectors + diff-vectors manifest (ADR-084) |
+| `lean/` | Lean | Verified Lean 4 mirror of the wire protocol — no `sorry`/`axiom`, `sorry` ratchet enforced (ADR-087) |
 | `docs/` | Markdown | Simulated hybrid encryption specification articles |
 
 ## TypeScript Module Map
@@ -47,7 +48,7 @@ Every protocol claim in this repository resolves to exactly one role row (ADR-08
 | `canonical-vectors` | `vectors/protocol.json` @ content-hash | sha256 | what conformance means; every vector carries a `mechanism` label |
 | `shipped` | `commitment.ts` / `aead.ts` / `keyderivation.ts` / `protocol.py` / `protocol.rs` SHA-256 path | commit SHA | what ships today |
 | `compiled` | `rust/pkg/multiplicity_crypto_rust_bg.wasm` — **removed** | sha256 `8f3ea751…` (historical) | what was built; wire-or-remove resolved as REMOVE (ADR-085) |
-| `claimed` | `lean/MultiplicityCrypto/Protocol.lean` | commit SHA, status: incomplete | what is asserted, not proven (ADR-087) |
+| `claimed` | `lean/MultiplicityCrypto/Protocol.lean` | commit SHA, status: verified — no `sorry`/`axiom` | what is claimed; proof surface ratified by `lake build` + `lean/.sorry-allowlist` ratchet (ADR-087) |
 
 Conformance is enforced by `npm run diff-vectors` (from `ts/`), which runs `shipped` vectors through the TypeScript, Python, and Rust shipped paths and `specified` vectors through `protocol.ts`, failing on any mismatch (ADR-084).
 
@@ -60,6 +61,8 @@ Python integration tests are in `py/multiplicity/cert/test_ace_crypto_integratio
 Rust tests are inline in `rust/src/transcript.rs` and `rust/src/protocol.rs`.
 
 Cross-language protocol conformance: `npm run diff-vectors` from `ts/` runs the `vectors/protocol.json` corpus through the TS (`ts/src/__tests__/vectors-conformance.test.ts`), Python (`py/scripts/vector_executor.py`), and Rust (`rust/src/bin/vector_executor.rs`) shipped paths; `--update` regenerates the pinned values from `protocol.ts` (ADR-084).
+
+Lean: `lake build` from the repo root must succeed with zero `sorry` warnings, and `scripts/check-sorry-allowlist.sh` (the `lean/.sorry-allowlist` ratchet) must exit 0 (ADR-087).
 
 ## Source References
 

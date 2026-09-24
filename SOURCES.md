@@ -69,7 +69,7 @@ Every protocol claim in this repository resolves to exactly one role row (ADR-08
 | `canonical-vectors` | `vectors/protocol.json` @ content-hash | sha256 | what conformance means; every vector carries a `mechanism` label |
 | `shipped` | `commitment.ts` / `aead.ts` / `keyderivation.ts` / `protocol.py` / `protocol.rs` SHA-256 path | commit SHA | what ships today |
 | `compiled` | `rust/pkg/multiplicity_crypto_rust_bg.wasm` — **removed** | sha256 `8f3ea751…` (historical) | what was built; wire-or-remove resolved as REMOVE (ADR-085) |
-| `claimed` | `lean/MultiplicityCrypto/Protocol.lean` | commit SHA, status: incomplete | what is asserted, not proven (ADR-087) |
+| `claimed` | `lean/MultiplicityCrypto/Protocol.lean` | commit SHA, status: verified — no `sorry`/`axiom` | what is claimed; proof surface ratified by `lake build` + `lean/.sorry-allowlist` ratchet (ADR-087) |
 
 ## Conformance Vectors — `vectors/`
 
@@ -80,12 +80,16 @@ Every protocol claim in this repository resolves to exactly one role row (ADR-08
 | `py/scripts/vector_executor.py` | New — Python conformance executor (role `shipped`) |
 | `ts/scripts/diff-vectors.mjs` | New — differential gate orchestrator |
 
-## Lean — `lean/MultiplicityCrypto/`
+## Lean — `lean/`
 
 | File | Origin |
 |------|--------|
-| `lean/MultiplicityCrypto/Protocol.lean` | New — role `claimed`, incomplete (status: `sorry` warnings; ADR-087) |
-| `lean/test.lean` | New — scratch build check (not in `lake` roots) |
+| `lean/MultiplicityCrypto/Protocol.lean` | New — role `claimed`, verified: no `sorry`/`axiom`; `contractivityBound_strict` and `domainTag_prime_inj` (restated with `p < 2^32`) proved (ADR-087) |
+| `lean/.sorry-allowlist` | New — ADR-087 ratchet allowlist; ships N=0 (both baseline `sorry`s proved in the same commit) |
+| `scripts/check-sorry-allowlist.sh` | New — ADR-087 ratchet: fails on new `sorry`/`stale` entries/`axiom`/`admit` |
+| `lakefile.lean` | New — Lake project at repo root, `srcDir := "lean"`, roots `#[MultiplicityCrypto.Protocol]` |
+
+`.lake/` build artifacts are gitignored (ADR-087).
 
 ## Documentation — `docs/`
 

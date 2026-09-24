@@ -1,0 +1,5 @@
+# ADR-087 sorry ratchet allowlist.
+# One symbol per line: a Lean declaration that may still contain `sorry`.
+# Baseline at ADR-087 acceptance was N=2 (contractivityBound_strict, domainTag_prime_inj);
+# both were proved in the same commit, so this file ships with N=0.
+# The only legal direction of change is N -> 0. Never add a line.
