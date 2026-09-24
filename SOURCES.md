@@ -14,6 +14,7 @@ File provenance for `multiplicity-crypto/`.
 | `ts/src/multiplicity.ts` | `packages/agiOS/src/multiplicity.ts` |
 | `ts/src/frequency.ts` | `packages/agiOS/src/frequency.ts` |
 | `ts/src/feedback.ts` | `packages/agiOS/src/feedback.ts` |
+| `ts/src/protocol.ts` | `packages/agiOS/src/protocol.ts` (expanded; canonical reference — role `specified`, ADR-084) |
 | `ts/src/__tests__/qkd-roundtrip.test.ts` | `packages/agiOS/src/__tests__/qkd-roundtrip.test.ts` |
 | `ts/src/__tests__/adr-007-e2e-cryptographic-roundtrip.test.ts` | `packages/agiOS/src/__tests__/adr-007-e2e-cryptographic-roundtrip.test.ts` |
 | `ts/src/__tests__/aead.test.ts` | New — P2 test coverage |
@@ -27,6 +28,7 @@ File provenance for `multiplicity-crypto/`.
 |-------------------|----------|
 | `py/multiplicity/__init__.py` | `packages/agiOS/src/multiplicity/__init__.py` (adjusted) |
 | `py/multiplicity/crypto/__init__.py` | `packages/agiOS/src/multiplicity/crypto/__init__.py` (paths adjusted, bridge removed) |
+| `py/multiplicity/crypto/protocol.py` | New — protocol mirror ported from TypeScript (role `shipped`, ADR-084) |
 | `py/multiplicity/math/__init__.py` | `packages/agiOS/src/multiplicity/math/__init__.py` (adjusted) |
 | `py/multiplicity/math/core_math.py` | `packages/agiOS/src/multiplicity/math/core_math.py` |
 | `py/multiplicity/math/cas_registry.py` | `packages/agiOS/src/multiplicity/math/cas_registry.py` |
@@ -54,7 +56,36 @@ File provenance for `multiplicity-crypto/`.
 | `rust/src/pedersen.rs` | New — BN254 Pedersen; build-time-only source, no compiled artifact (ADR-085) |
 | `rust/src/protocol.rs` | New — protocol types ported from TypeScript |
 | `rust/src/protocol_kani.rs` | New — Kani verification harness |
+| `rust/src/bin/vector_executor.rs` | New — ADR-084 conformance executor (stdin → stdout, no JSON dependency) |
 | `rust/Cargo.toml` | New minimal crate definition |
+
+## Protocol Family Role Map
+
+Every protocol claim in this repository resolves to exactly one role row (ADR-084). A label that resolves to no row is a hypothesis, not a claim. ADR-090's provenance register is authoritative.
+
+| Role | Artifact | Pins | Meaning |
+|------|----------|------|---------|
+| `specified` | `ts/src/protocol.ts` @ commit | commit SHA + line range | what the spec intends; canonical reference bound by `specified` vectors |
+| `canonical-vectors` | `vectors/protocol.json` @ content-hash | sha256 | what conformance means; every vector carries a `mechanism` label |
+| `shipped` | `commitment.ts` / `aead.ts` / `keyderivation.ts` / `protocol.py` / `protocol.rs` SHA-256 path | commit SHA | what ships today |
+| `compiled` | `rust/pkg/multiplicity_crypto_rust_bg.wasm` — **removed** | sha256 `8f3ea751…` (historical) | what was built; wire-or-remove resolved as REMOVE (ADR-085) |
+| `claimed` | `lean/MultiplicityCrypto/Protocol.lean` | commit SHA, status: incomplete | what is asserted, not proven (ADR-087) |
+
+## Conformance Vectors — `vectors/`
+
+| File | Origin |
+|------|--------|
+| `vectors/protocol.json` | Generated from `ts/src/protocol.ts`; regenerated with `npm run diff-vectors -- --update` (ADR-084) |
+| `ts/src/__tests__/vectors-conformance.test.ts` | New — TypeScript conformance suite (gate, `--update` regeneration) |
+| `py/scripts/vector_executor.py` | New — Python conformance executor (role `shipped`) |
+| `ts/scripts/diff-vectors.mjs` | New — differential gate orchestrator |
+
+## Lean — `lean/MultiplicityCrypto/`
+
+| File | Origin |
+|------|--------|
+| `lean/MultiplicityCrypto/Protocol.lean` | New — role `claimed`, incomplete (status: `sorry` warnings; ADR-087) |
+| `lean/test.lean` | New — scratch build check (not in `lake` roots) |
 
 ## Documentation — `docs/`
 
