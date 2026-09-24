@@ -51,7 +51,7 @@ File provenance for `multiplicity-crypto/`.
 |-------------------|----------|
 | `rust/src/transcript.rs` | `packages/agiOS/crates/prover/src/transcript.rs` |
 | `rust/src/lib.rs` | New barrel module |
-| `rust/src/pedersen.rs` | New — BN254 Pedersen (dependencies present, WASM not built) |
+| `rust/src/pedersen.rs` | New — BN254 Pedersen; build-time-only source, no compiled artifact (ADR-085) |
 | `rust/src/protocol.rs` | New — protocol types ported from TypeScript |
 | `rust/src/protocol_kani.rs` | New — Kani verification harness |
 | `rust/Cargo.toml` | New minimal crate definition |
@@ -81,7 +81,7 @@ File provenance for `multiplicity-crypto/`.
 - `rust/Cargo.toml`: empty `[dev-dependencies]` section removed; `[workspace]` table retained as opt-out of parent workspace.
 - `ts/package.json`: `vitest` added to `devDependencies`; `vitest.config.ts` created with `globals: true` (post-consolidation).
 - `ts/tsconfig.json`: `"jest"` removed from `types` array; `"vitest/globals"` added.
-- `README.md`: title updated from "QKD Hybrid Encryption v1.0.1" to "Simulated classical hybrid encryption with prime-indexed tags v1.0.1"; commitment module description updated to "SHA-256 commitment with prime-indexed domain tags; BN254 WASM not built".
+- `README.md`: title updated from "QKD Hybrid Encryption v1.0.1" to "Simulated classical hybrid encryption with prime-indexed tags v1.0.1"; commitment module description updated to the SHA-256 mechanism (later refined by ADR-085: the BN254 source is build-time-only, no compiled artifact is committed).
 
 ## Missing / Stubbed Modules (Python)
 
@@ -110,9 +110,9 @@ The following bridge artifacts were referenced in the original `py/multiplicity/
 
 Per ADR-076, the Node.js bridge dependency has been removed. `MultiplicityCrypto` now operates in SHA-256 fallback mode exclusively.
 
-## Rust Dependencies (WASM Not Built)
+## Rust Dependencies (Build-Time Only)
 
-`rust/Cargo.toml` declares `ark-bn254`, `ark-ec`, `ark-ff`, `wasm-bindgen` for BN254 Pedersen commitments, but **no `wasm-pack build` has been executed**. The `rust/pkg/` directory does not exist. The SHA-256 fallback in TypeScript (`PM-COMMIT-p${prime}`) is the shipped commitment mechanism (ADR-070).
+`rust/Cargo.toml` declares `ark-bn254`, `ark-ec`, `ark-ff`, `wasm-bindgen` and `getrandom` (js) for an optional BN254 Pedersen commitment path (`rust/src/pedersen.rs`). Per ADR-085 (Option B, committed artifact removed), `wasm-pack` may be run to produce a loadable artifact at `rust/pkg/`; **no compiled artifact is committed.** The SHA-256 commitment (`PM-COMMIT-p${prime}`, ADR-070) is the only shipped commitment mechanism.
 
 ## Test Infrastructure (Post-Consolidation)
 

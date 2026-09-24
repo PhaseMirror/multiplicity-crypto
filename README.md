@@ -1,6 +1,6 @@
 # multiplicity-crypto
 
-Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cryptographic component built with native multiplicity methodology. No quantum channel. No BN254 WASM on disk.
+Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cryptographic component built with native multiplicity methodology. No quantum channel. `wasm-pack` may be run to produce a BN254 artifact; no compiled artifact is committed (ADR-085).
 
 ## Contents
 
@@ -16,7 +16,7 @@ Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cry
 - `qkd.ts` — Pipeline composition root (`computeTranscript → deriveKey → computeCommitment → encryptAEAD`)
 - `transcript.ts` — Per-sender SHA-256 hash-chain + context hash
 - `keyderivation.ts` — HKDF-SHA256 with prime-indexed domain separation
-- `commitment.ts` — SHA-256 commitment with prime-indexed domain tags; BN254 WASM not built
+- `commitment.ts` — SHA-256 commitment with prime-indexed domain tags (`PM-COMMIT-p${prime}`, ADR-070); the BN254 Pedersen source is build-time-only (ADR-085)
 - `aead.ts` — AES-256-GCM with prime-indexed nonce domain tag
 - `multiplicity.ts` — `MultiplicityProfile` encode/decode, prime sieve `getPrimeAtIndex`
 - `frequency.ts` — Classical/quantum frequency mapping

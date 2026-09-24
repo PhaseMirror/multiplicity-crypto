@@ -2,7 +2,7 @@
 name = "multiplicity-crypto-rust"
 version = "1.0.0"
 edition = "2021"
-description = "Keccak256 Fiat-Shamir transcript; BN254 Pedersen dependencies present but WASM not built"
+description = "Keccak256 Fiat-Shamir transcript; BN254 Pedersen (arkworks) and wasm-bindgen deps are build-time-only sources, no compiled wasm artifact is committed (ADR-085)"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
