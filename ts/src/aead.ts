@@ -1,4 +1,4 @@
-// AEAD module for QKD Hybrid Encryption v1.0.1
+// AEAD module — simulated classical hybrid encryption with prime-indexed tags
 // Implements AEAD encrypt/decrypt over context hash
 
 import crypto from 'crypto';

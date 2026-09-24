@@ -46,7 +46,7 @@ export class HardwareQKDBackend implements IQKDBackend {
     }
   }
 }
-// QKD Simulator module for QKD Hybrid Encryption v1.0.1
+// QKD Simulator module — simulated classical hybrid encryption with prime-indexed tags
 // Week 4: simulateQKD is now the sequential composition root:
 //   computeTranscript → deriveKey → computeCommitment → encryptAEAD
 // IQKDBackend interface and simulatedKey: Buffer return shape are unchanged.

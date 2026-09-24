@@ -1,4 +1,4 @@
-// Key Derivation module for QKD Hybrid Encryption v1.0.1
+// Key Derivation module — simulated classical hybrid encryption with prime-indexed tags
 // Implements HKDF with role labels, context hash, and multiplicity profile slot
 // Inputs: transcript hash, role, multiplicity profile
 // Outputs: deterministic key material, context hashes

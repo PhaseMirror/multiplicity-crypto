@@ -1,4 +1,4 @@
-// Frequency Mapping module for QKD Hybrid Encryption v1.0.1
+// Frequency Mapping module — simulated classical hybrid encryption with prime-indexed tags
 // Implements F_c (classical) and F_q (quantum) frequency mappings
 // Inputs: classical payload x_t, quantum state psi_t
 // Outputs: frequency mapping F_t

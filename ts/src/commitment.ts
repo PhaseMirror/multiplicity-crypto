@@ -1,11 +1,10 @@
-// Commitment API for QKD Hybrid Encryption v1.0.1
-// Implements Pedersen commitment (WASM-backed, BN254), fallback warning if unavailable
+// SHA-256 commitment with prime-indexed domain tags (PM-COMMIT-p${prime}).
+// BN254 WASM is not the default execution path (ADR-070; ADR-085).
 // Inputs: message, randomness, profile (optional)
 // Outputs: deterministic commitment output
-// Contract: deterministic, matches WASM vectors, testable
-// Week 3: prime-indexed domain separation — PM-COMMIT-p${prime} tag makes commitments
-// at different prime indices non-interchangeable without changing the WASM ABI.
+// Contract: deterministic, matches SHA-256 vectors, testable
 
+import { createHash } from 'crypto';
 import { MultiplicityProfile, getPrimeAtIndex, defaultProfile } from './multiplicity';
 
 export interface CommitmentInput {
@@ -27,7 +26,7 @@ export function computeCommitment({ message, randomness, profile }: CommitmentIn
 
   // SHA-256 tagged commitment: domain-separate by prime index
   const data = Buffer.concat([domainTag, message, randomness]);
-  const commitment = require('crypto').createHash('sha256').update(data).digest();
+  const commitment = createHash('sha256').update(data).digest();
   
   return { commitment };
 }

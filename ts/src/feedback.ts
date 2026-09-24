@@ -1,4 +1,4 @@
-// Feedback module for QKD Hybrid Encryption v1.0.1
+// Feedback module — simulated classical hybrid encryption with prime-indexed tags
 // Implements (M_{t+1}, T_{t+1}) feedback dynamics
 // Week 2: contractivity bound aligned with ConstitutionModel L0-5 (Art. VIII §8.1)
 // Scaling function: upper_bound = p/(p+1) where p = getPrimeAtIndex(prime_index)

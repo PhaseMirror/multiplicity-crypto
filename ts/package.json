@@ -6,7 +6,7 @@
   "description": "Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — TypeScript implementation",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "test": "vitest run"
   },
   "devDependencies": {

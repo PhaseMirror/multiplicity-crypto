@@ -1,4 +1,4 @@
-// Transcript module for QKD Hybrid Encryption v1.0.1
+// Transcript module — simulated classical hybrid encryption with prime-indexed tags
 // Implements per-sender SHA-256 hash chain and context hash
 // Inputs: message sequence, nonces, protocol version, multiplicity profile
 // Outputs: per-sender hash chain, context hash, finalPrimeIndex

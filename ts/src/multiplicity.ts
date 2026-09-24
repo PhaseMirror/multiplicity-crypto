@@ -1,4 +1,4 @@
-// Multiplicity module for QKD Hybrid Encryption v1.0.1
+// Multiplicity module — simulated classical hybrid encryption with prime-indexed tags
 // Implements M_t state management and profile encoding/decoding
 
 // Operational upper bound on prime_index. getPrimeAtIndex(1000) = prime 7,919.
