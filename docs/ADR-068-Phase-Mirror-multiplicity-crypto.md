@@ -11,7 +11,7 @@
 
 The `packages/multiplicity-crypto` package ships under the label "QKD Hybrid Encryption v1.0.1" but its executed paths are:
 
-- TypeScript: `MockQKDBackend.simulateQKD()` → SHA-256 + HKDF + AES-256-GCM (2/2 tests pass with `--globals` flag)
+- TypeScript: `MockQKDBackend.simulateQKD()` → SHA-256 + HKDF + AES-256-GCM (2/2 tests that run pass with `--globals` flag; ADR-090 §4)
 - Commitment: SHA-256 stub tagged `PM-COMMIT-p${prime}` (WASM BN254 path unreachable — `rust/pkg/commitment_wasm` does not exist)
 - Python: Package unimportable (`from . import agi` at `__init__.py:32` is unwrapped); numpy/sympy/pytest/pirtm absent; bridge files `ts/python/crypto_bridge.js` and `ts/dist/src/index.js` absent
 - Rust: Keccak256 transcript 2/2 (correct)

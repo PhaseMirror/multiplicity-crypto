@@ -52,7 +52,7 @@ The Rust `Cargo.toml` declares `ark-bn254`, `ark-ec`, `wasm-bindgen` dependencie
 - `grep -r "Pedersen.*WASM" README.md docs/ ts/src/commitment.ts` returns zero capability claims
 - `grep -r "BN254" README.md docs/ ts/src/commitment.ts` returns zero capability claims
 - `computeCommitment` produces deterministic SHA-256 output with `PM-COMMIT-p${prime}` tag
-- TypeScript tests pass with SHA-256 commitment path
+- TypeScript tests that run pass with the SHA-256 commitment path (ADR-090 §4)
 
 ## References
 

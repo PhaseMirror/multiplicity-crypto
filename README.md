@@ -11,6 +11,7 @@ Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cry
 | `rust/src/` | Rust | Keccak256 Fiat-Shamir transcript for prover challenges |
 | `vectors/` | JSON | Protocol family conformance vectors + diff-vectors manifest (ADR-084) |
 | `lean/` | Lean | Verified Lean 4 mirror of the wire protocol — no `sorry`/`axiom`, `sorry` ratchet enforced (ADR-087) |
+| `PROVENANCE.md` | Markdown | Claim register — every claim pinned to `path @ commit` + sha256 + probe (ADR-090) |
 | `docs/` | Markdown | Simulated hybrid encryption specification articles |
 
 ## TypeScript Module Map
@@ -63,6 +64,8 @@ Rust tests are inline in `rust/src/transcript.rs` and `rust/src/protocol.rs`.
 Cross-language protocol conformance: `npm run diff-vectors` from `ts/` runs the `vectors/protocol.json` corpus through the TS (`ts/src/__tests__/vectors-conformance.test.ts`), Python (`py/scripts/vector_executor.py`), and Rust (`rust/src/bin/vector_executor.rs`) shipped paths; `--update` regenerates the pinned values from `protocol.ts` (ADR-084).
 
 Lean: `lake build` from the repo root must succeed with zero `sorry` warnings, and `scripts/check-sorry-allowlist.sh` (the `lean/.sorry-allowlist` ratchet) must exit 0 (ADR-087).
+
+Provenance: every claim above resolves in `PROVENANCE.md` to `path @ commit`, sha256, and a probe command (ADR-090, ADR-091).
 
 ## Source References
 

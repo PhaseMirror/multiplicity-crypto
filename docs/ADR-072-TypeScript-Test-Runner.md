@@ -18,7 +18,7 @@ The TypeScript test configuration has multiple contradictions:
 
 3. No `vitest.config.ts` existed — tests required manual `--globals` flag to run
 
-4. TEST_RESULTS.md confirms: after adding `vitest` to devDependencies and creating `vitest.config.ts` with `globals: true`, all 17 tests pass.
+4. TEST_RESULTS.md confirms: after adding `vitest` to devDependencies and creating `vitest.config.ts` with `globals: true`, all 17 tests that run pass (ADR-090 §4).
 
 ## Decision
 
@@ -41,7 +41,7 @@ The TypeScript test configuration has multiple contradictions:
 
 ## Testing
 
-- `cd ts && npm test` exits 0 with 17/17 tests passing
+- `cd ts && npm test` exits 0 with 17/17 tests that run pass (ADR-090 §4)
 - `cd ts && npx tsc --noEmit` passes (no type errors from missing jest types)
 - `grep "jest" ts/tsconfig.json` returns no matches in `types` array
 - `cat ts/vitest.config.ts` shows `globals: true`
