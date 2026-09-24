@@ -159,14 +159,16 @@ Per ADR-076, the Node.js bridge dependency has been removed. `MultiplicityCrypto
 | `ts/src/__tests__/feedback.test.ts` | Created post-consolidation |
 | `ts/src/__tests__/frequency.test.ts` | Created post-consolidation |
 | `py/setup.py` dependencies | `numpy`, `sympy`, `cryptography` in `install_requires`; `pytest` in `extras_require["test"]`; `pirtm` in `extras_require["cas"]` (ADR-089) |
+| `PROVENANCE.md` (+ section A/B/C/D/E role/pin rows) | Created — claim register backing ADR-084 role rows, artifact dispositions, D-items and suite counts (ADR-090) |
+| `probes/adr-*.sh`, `probes/run-all.sh` | Created — conformance gate, one probe per accepted ADR, blocking merge control (ADR-091) |
 
-## Python Module Import Inventory (100% Coverage)
+## Python Module Import Inventory (All Imports Accounted)
 
 Every `import` in `py/multiplicity/` is accounted for:
 
 - **Standard library**: `hashlib`, `json`, `os`, `shutil`, `subprocess`, `asyncio`, `logging`, `dataclasses`, `typing`, `datetime`, `pathlib`, `sys`
 - **Internal (implemented)**: `.math.core_math`, `.math.cas_registry`, `.cert.lambda_m_protocols`, `.mkt.mkt_commitment`, `.mkt.mkt_colored_braid`, `.mkt.mkt_constants_estimation`, `.mkt.mkt_invariant`, `.crypto` (protocol, bridge)
 - **Internal (stubbed)**: `.agi`, `.topos`, `.cert`, `.utils`, `.moonshine`, `.zeno_heartbeat`, `.kernel_telemetry` — all wrapped in `try/except` loop
-- **External (declared in setup.py)**: `numpy`, `sympy`, `cryptography`
-- **External (test-only)**: `pytest` (in `extras_require["test"]`)
-- **External (missing, causes CAS_AVAILABLE=False)**: `pirtm` — not in `install_requires`, optional dependency
+- **External (in `install_requires`)**: `numpy`, `sympy`, `cryptography`
+- **External (test-only, `extras_require["test"]`)**: `pytest`
+- **External (optional, `extras_require["cas"]`)**: `pirtm` — `CAS_AVAILABLE=False` and the ACE integration test skips cleanly when absent (ADR-089)

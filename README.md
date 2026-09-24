@@ -12,6 +12,7 @@ Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cry
 | `vectors/` | JSON | Protocol family conformance vectors + diff-vectors manifest (ADR-084) |
 | `lean/` | Lean | Verified Lean 4 mirror of the wire protocol — no `sorry`/`axiom`, `sorry` ratchet enforced (ADR-087) |
 | `PROVENANCE.md` | Markdown | Claim register — every claim pinned to `path @ commit` + sha256 + probe (ADR-090) |
+| `probes/` | Bash | Conformance gate — one probe per accepted ADR, `run-all.sh` blocks merge on failure (ADR-091) |
 | `docs/` | Markdown | Simulated hybrid encryption specification articles |
 
 ## TypeScript Module Map
@@ -66,6 +67,8 @@ Cross-language protocol conformance: `npm run diff-vectors` from `ts/` runs the 
 Lean: `lake build` from the repo root must succeed with zero `sorry` warnings, and `scripts/check-sorry-allowlist.sh` (the `lean/.sorry-allowlist` ratchet) must exit 0 (ADR-087).
 
 Provenance: every claim above resolves in `PROVENANCE.md` to `path @ commit`, sha256, and a probe command (ADR-090, ADR-091).
+
+Conformance: `bash probes/run-all.sh` runs every `probes/adr-*.sh`; a failing probe blocks merge (ADR-091).
 
 ## Source References
 

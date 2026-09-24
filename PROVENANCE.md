@@ -64,3 +64,27 @@ Every path below is either git-ignored or removed; none is an unregistered commi
 At the ADR-090 commit: TypeScript 55/55 across 8 files (`cd ts && npm test` → `Tests 55 passed`); Python `cd py && python3 -m pytest tests/ -q` → 20 passed, integration file → 1 skipped without `pirtm`; Rust `cd rust && cargo test` → 9/9; diff-vectors 14/14 across ts/py/rust (`npm run diff-vectors`). Known-untested surface listed wherever coverage is cited: `commitment.ts`, `keyderivation.ts`, `transcript.ts`, `multiplicity.ts` (no committed unit tests outside the cross-language gate); `py/multiplicity/crypto/__init__.py`, `py/multiplicity/crypto/protocol.py` (no dedicated unit tests; covered by the diff-vectors gate); Rust `pedersen.rs` (none). Any line that says "tests pass" MUST instead carry the runnable/unrunnable split.
 
 Every occurrence of the substring "tests pass" in `docs/`, `README.md`, and ADR files reads "tests that run pass" or carries the split (ADR-090 Testing). `git diff --exit-code PROVENANCE.md` is enforced — the register MUST be committed with the tree it describes (ADR-090 Testing).
+
+## F. Conformance probes (ADR-091)
+
+Each accepted ADR registers one probe — the smallest command whose failure proves the tree violates that ADR. `probes/run-all.sh` executes every `probes/adr-*.sh`; a failing probe blocks merge (ADR-091 #3). Probes use `git grep` so they read the committed tree only.
+
+| Probe | Guards | Probe command |
+|-------|--------|---------------|
+| `probes/adr-069.sh` | ADR-069 label honesty | no "QKD Hybrid Encryption" in `README.md`, `ts/package.json`, `py/multiplicity/crypto/__init__.py` |
+| `probes/adr-070.sh` | ADR-070 mechanism claim | `commitment.ts` header SHA-256/`PM-COMMIT`, no `Pedersen`/`WASM-backed` |
+| `probes/adr-072.sh` | ADR-072 runner | `"vitest"` in `ts/package.json`; `globals: true` in `vitest.config.ts` |
+| `probes/adr-074.sh` | ADR-074 placeholder | no "computed on commit" in tracked sources |
+| `probes/adr-076.sh` | ADR-076 bridge removal | no `crypto_bridge.js`/`DIST_ENTRY_PATH`/`BRIDGE_SCRIPT_PATH` in `py/multiplicity` |
+| `probes/adr-078.sh` | ADR-078 runner types | no `jest` in `ts/tsconfig.json` |
+| `probes/adr-083.sh` | ADR-083 PQ honesty | no post-quantum/quantum-resistant capability claim co-occurring with `BN254`/`commitment`/`Pedersen` in README.md/SOURCES.md/source headers (scoped per ADR-091 addendum) |
+| `probes/adr-084.sh` | ADR-084 diff-vectors gate | `npm run diff-vectors` → 14/14 × ts/py/rust |
+| `probes/adr-085.sh` | ADR-085 wasm retirement | no tracked `.wasm` artifact |
+| `probes/adr-086.sh` | ADR-086 header correctness | no "QKD Hybrid Encryption" in `ts/src`; `PM-COMMIT` present in `commitment.ts` |
+| `probes/adr-087.sh` | ADR-087 Lean proof surface | no `sorry`/`axiom`/`admit` in `lean/MultiplicityCrypto`; `check-sorry-allowlist.sh` exit 0 |
+| `probes/adr-088.sh` | ADR-088 honest labels | `HARDWARE_QKD_ETSI_014` in `qkd.ts` + hardware test; `SIMULATED_QKD` default in `qkd.ts` |
+| `probes/adr-089.sh` | ADR-089 optional-dep honesty | `pirtm` in `py/setup.py`; `importorskip("pirtm")`; ≥3 MKT placeholder markers; `NotImplementedError` guard |
+| `probes/adr-090.sh` | ADR-090 register | `PROVENANCE.md` committed & `git diff --exit-code` clean; `rust/target/`, `.lake/` untracked |
+| `probes/adr-091.sh` | ADR-091 self | `probes/run-all.sh` present/executable; ≥15 probe scripts tracked |
+
+Simulated-contradiction check at acceptance: mutating `dev/null`-free temporary copy of `ts/src/commitment.ts` header to reintroduce `WASM-backed` makes `probes/adr-070.sh` fail — the gate itself is verified to detect the D-12 class of regression (ADR-091 Testing).
