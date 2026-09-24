@@ -35,12 +35,13 @@ export class HardwareQKDBackend implements IQKDBackend {
 
       // Use the raw quantum key as the base entropy for the pipeline
       const quantumSecret = Buffer.from(data.keys[0].key, 'base64');
-      const pipelineOut = simulateQKD({ ...input, sharedSecret: quantumSecret });
+      const pipelineOut = simulateQKD({
+        ...input,
+        sharedSecret: quantumSecret,
+        keySourceLabel: 'HARDWARE_QKD_ETSI_014'
+      });
 
-      return {
-        simulatedKey: pipelineOut.simulatedKey,
-        label: `HARDWARE_QKD_ETSI_014:${data.keys[0].key_ID}`
-      };
+      return pipelineOut;
     } catch (error) {
       throw new Error(`Hardware QKD fetch failed: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -63,6 +64,7 @@ export interface QKDSimulatorInput {
   context: Buffer;
   profile: MultiplicityProfile;
   sharedSecret: Buffer; // The simulated entanglement base
+  keySourceLabel?: string; // Honest key-source label; defaults to 'SIMULATED_QKD' (ADR-088)
 }
 
 export interface QKDSimulatorOutput {
@@ -70,7 +72,7 @@ export interface QKDSimulatorOutput {
   label: string;
 }
 
-export function simulateQKD({ role, context, profile, sharedSecret }: QKDSimulatorInput): QKDSimulatorOutput {
+export function simulateQKD({ role, context, profile, sharedSecret, keySourceLabel = 'SIMULATED_QKD' }: QKDSimulatorInput): QKDSimulatorOutput {
   // Step 1: Transcript — establishes hash chain context
   const { contextHash, finalPrimeIndex } = computeTranscript({
     messages: [context],
@@ -112,5 +114,5 @@ export function simulateQKD({ role, context, profile, sharedSecret }: QKDSimulat
     );
   }
 
-  return { simulatedKey: key, label: 'SIMULATED_QKD' };
+  return { simulatedKey: key, label: keySourceLabel };
 }

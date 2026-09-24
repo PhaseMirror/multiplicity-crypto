@@ -15,7 +15,7 @@ Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — the cry
 
 ## TypeScript Module Map
 
-- `qkd.ts` — Pipeline composition root (`computeTranscript → deriveKey → computeCommitment → encryptAEAD`)
+- `qkd.ts` — Pipeline composition root (`computeTranscript → deriveKey → computeCommitment → encryptAEAD`); `HardwareQKDBackend` (ETSI GS QKD 014, `HARDWARE_QKD_ETSI_014` label) available on the opt-in path, exercised only against mock endpoints in tests (ADR-088)
 - `protocol.ts` — **`specified`** (ADR-084): canonical wire protocol — 7-byte frame codec, per-role transcript chains, directional AES-256-GCM AEAD envelope, strict sequence state; mirrored by Python and Rust
 - `transcript.ts` — Per-sender SHA-256 hash-chain + context hash
 - `keyderivation.ts` — HKDF-SHA256 with prime-indexed domain separation

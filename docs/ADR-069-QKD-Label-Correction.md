@@ -16,7 +16,7 @@ The executed code path is `MockQKDBackend.simulateQKD()` in `ts/src/qkd.ts:36-78
 3. Calls `computeCommitment` (SHA-256 fallback, not Pedersen)
 4. Calls `encryptAEAD` (AES-256-GCM)
 
-No quantum hardware, no entanglement, no BB84/E91 simulation, no QBER monitoring, no photon channel exists anywhere in the codebase.
+No quantum channel exists on the *default* executed path; an opt-in `HardwareQKDBackend` ETSI GS QKD 014 REST client exists and is exercised only against mock endpoints in tests (amended by ADR-088).
 
 ## Decision
 
