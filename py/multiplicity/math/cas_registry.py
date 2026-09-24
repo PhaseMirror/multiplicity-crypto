@@ -2,13 +2,16 @@
 CAS Registry — Content Addressable Storage with Cryptographic Commitments
 
 Provides the Python-ACE bridge connecting the Algebraic Constraint Engine
-with WASM-based Pedersen commitments for cryptographically-backed ACE witnesses.
+with SHA-256-tagged commitments for cryptographically-backed ACE witnesses
+(PM-COMMIT-p domain tags, ADR-070).
 
 This registry enables:
 - Cryptographic verification of ACE certificates
-- Pedersen commitment-based witness storage and retrieval
+- SHA-256 commitment-based witness storage and retrieval
 - Zero-knowledge proof integration for ACE governance
 - Merkle tree-based batch verification of constraint certificates
+
+The BN254 Pedersen artifact is build-time-only and not wired (ADR-085).
 
 See ADR-087 for design rationale and ADR-063a for crypto migration context.
 """
@@ -131,13 +134,13 @@ class CryptoBackedWitness:
     """
     ACE witness with cryptographic commitment backing.
 
-    Extends AceWitness with Pedersen commitments for:
+    Extends AceWitness with SHA-256 commitments for:
     - Witness integrity (hiding property)
     - Witness authenticity (binding property)
     - Batch verification (Merkle tree aggregation)
     """
     witness: AceWitness
-    commitment: str                    # Pedersen commitment to witness data
+    commitment: str                    # SHA-256 commitment to witness data (ADR-070)
     salt: str                         # Random salt for commitment
     merkle_root: Optional[str] = None # Merkle root if part of batch
     merkle_proof: Optional[List[str]] = None # Proof path if part of batch
@@ -212,7 +215,7 @@ class CasRegistry:
     Content Addressable Storage registry for ACE witnesses.
 
     Provides cryptographic guarantees for:
-    - Witness immutability (Pedersen commitments)
+    - Witness immutability (SHA-256 commitments)
     - Batch verification (Merkle trees)
     - Identity management (commitment-based)
     - Audit trails (redacted identity tracking)

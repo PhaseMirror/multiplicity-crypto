@@ -56,7 +56,7 @@ Conformance is enforced by `npm run diff-vectors` (from `ts/`), which runs `ship
 
 TypeScript tests are located in `ts/src/__tests__/` and use a zero-dependency mock backend.
 
-Python integration tests are in `py/multiplicity/cert/test_ace_crypto_integration.py`.
+Python: `cd py && python3 -m pytest tests/ -q` runs the runnable suite. The ACE integration test (`py/multiplicity/cert/test_ace_crypto_integration.py`) skips cleanly when the optional `pirtm` dependency (`extras_require["cas"]`) is absent, instead of erroring (ADR-089).
 
 Rust tests are inline in `rust/src/transcript.rs` and `rust/src/protocol.rs`.
 

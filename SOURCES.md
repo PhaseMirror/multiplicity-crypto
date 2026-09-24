@@ -131,7 +131,7 @@ The following modules are referenced in `py/multiplicity/__init__.py` but do not
 | `multiplicity.moonshine` | Stub | `py/multiplicity/moonshine/__init__.py` — empty stub |
 | `multiplicity.zeno_heartbeat` | Stub | `py/multiplicity/zeno_heartbeat/__init__.py` — exports `HeartbeatConfig`, `assess_rt_feasibility`, `enforce_heartbeat` as no-ops |
 | `multiplicity.kernel_telemetry` | Stub | `py/multiplicity/kernel_telemetry/__init__.py` — exports `KernelTelemetry`, `emit_telemetry`, etc. as no-ops |
-| `pirtm` (external) | Missing | Referenced in `cas_registry.py:27-28` and `test_ace_crypto_integration.py`; not vendored; `CAS_AVAILABLE=False` when absent |
+| `pirtm` (external) | Optional dep | Declared in `extras_require["cas"] = ["pirtm"]` (ADR-089); not vendored; `CAS_AVAILABLE=False` when absent and the integration test skips cleanly |
 | `mkt_colored_braid` | Stub | `py/multiplicity/mkt/mkt_colored_braid.py` — `BraidWord` class |
 | `mkt_constants_estimation` | Stub | `py/multiplicity/mkt/mkt_constants_estimation.py` — `c0_of_x`, `z_of_x` returning 0.0 |
 | `mkt_invariant` | Stub | `py/multiplicity/mkt/mkt_invariant.py` — `p_of_braid_x` returning 0.0 |
@@ -158,7 +158,7 @@ Per ADR-076, the Node.js bridge dependency has been removed. `MultiplicityCrypto
 | `ts/src/__tests__/aead.test.ts` | Created post-consolidation |
 | `ts/src/__tests__/feedback.test.ts` | Created post-consolidation |
 | `ts/src/__tests__/frequency.test.ts` | Created post-consolidation |
-| `py/setup.py` dependencies | `numpy`, `sympy`, `cryptography` in `install_requires`; `pytest` in `extras_require["test"]` |
+| `py/setup.py` dependencies | `numpy`, `sympy`, `cryptography` in `install_requires`; `pytest` in `extras_require["test"]`; `pirtm` in `extras_require["cas"]` (ADR-089) |
 
 ## Python Module Import Inventory (100% Coverage)
 

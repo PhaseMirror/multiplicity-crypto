@@ -12,6 +12,7 @@ setup(
     ],
     extras_require={
         "test": ["pytest"],
+        "cas": ["pirtm"],
     },
     description="Simulated classical hybrid encryption with prime-indexed tags v1.0.1 — Python interop bridge",
 )

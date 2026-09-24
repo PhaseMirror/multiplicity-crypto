@@ -10,15 +10,13 @@ These checks validate the Phase 2 Python bridge end-to-end:
 from __future__ import annotations
 
 import asyncio
-import os
-import sys
 
 import numpy as np
+import pytest
 
-# Add pirtm to path
-pirtm_path = os.path.join(os.path.dirname(__file__), '..', 'pirtm')
-if pirtm_path not in sys.path:
-    sys.path.insert(0, pirtm_path)
+# pirtm is an optional dependency (extras_require["cas"], ADR-089 #1):
+# skip cleanly instead of erroring when the CAS stack is not installed.
+pirtm = pytest.importorskip("pirtm")
 
 from pirtm.ace.protocol import AceProtocol
 from pirtm.step_types import StepInfo

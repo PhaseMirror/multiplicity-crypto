@@ -1,5 +1,5 @@
 # multiplicity/mkt/mkt_colored_braid.py
-# Stub — module not implemented in this consolidation. See SOURCES.md.
+# NOT IMPLEMENTED — MBC prototype placeholder. See SOURCES.md.
 
 class BraidWord:
     def __init__(self, generators=()):

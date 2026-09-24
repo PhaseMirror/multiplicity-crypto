@@ -47,6 +47,14 @@ def commit(pp: dict, message: str, braid: BraidWord) -> tuple[Commitment, Openin
         z_x = z_of_x(x)
         vector.append(p_of_braid_x(braid, x_cutoff=x, c0_x=c0_x, z_x=z_x))
 
+    if all(component == 0.0 for component in vector):
+        raise NotImplementedError(
+            "MBC prototype placeholder (ADR-077 #2): the stub invariants return "
+            "a constant, which would silently degenerate the commitment to a "
+            "constant-returning value. Refusing to use the degenerate 0.0 path "
+            "(ADR-089 #2)."
+        )
+
     return (
         Commitment(digest=digest, invariant_vector=tuple(vector)),
         OpeningData(message=message, braid_serialized=braid.serialize()),
